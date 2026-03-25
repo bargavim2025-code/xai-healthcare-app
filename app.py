@@ -12,9 +12,51 @@ from sklearn.metrics import accuracy_score
 # ================================
 # Page Config
 # ================================
-st.set_page_config(page_title="AI Healthcare App", layout="wide")
+st.set_page_config(page_title="AI Healthcare", layout="wide")
 
-st.markdown("<h1 style='text-align: center;'>🏥 Explainable AI Healthcare System</h1>", unsafe_allow_html=True)
+# ================================
+# Custom CSS (COLORFUL UI)
+# ================================
+st.markdown("""
+<style>
+body {
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+}
+
+.main {
+    background-color: #f5f7fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+}
+
+.stButton>button {
+    background: linear-gradient(to right, #ff416c, #ff4b2b);
+    color: white;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+    font-size: 18px;
+}
+
+.stTextInput>div>div>input {
+    border-radius: 10px;
+}
+
+.stNumberInput input {
+    border-radius: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ================================
+# Title
+# ================================
+st.markdown("<h1>🏥 AI Healthcare Decision System</h1>", unsafe_allow_html=True)
 
 # ================================
 # Load Dataset
@@ -43,21 +85,27 @@ model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train_scaled, y_train)
 
 # ================================
-# Model Accuracy
+# Accuracy Card
 # ================================
 accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
-st.write(f"### 📊 Model Accuracy: {accuracy:.2f}")
+
+st.markdown(f"""
+<div style='background: #ffffff; padding: 15px; border-radius: 10px; text-align:center;'>
+<h3>📊 Model Accuracy</h3>
+<h2 style='color: green;'>{accuracy:.2f}</h2>
+</div>
+""", unsafe_allow_html=True)
 
 # ================================
 # Patient Info
 # ================================
-st.subheader("👤 Patient Information")
-name = st.text_input("Patient Name")
+st.subheader("👤 Patient Details")
+name = st.text_input("Enter Patient Name")
 
 # ================================
-# Input Fields
+# Inputs in Columns
 # ================================
-st.subheader("🧾 Enter Medical Details")
+st.subheader("🧾 Medical Inputs")
 
 col1, col2 = st.columns(2)
 
@@ -74,9 +122,10 @@ with col2:
     age = st.number_input("Age", 1, 120, 30)
 
 # ================================
-# Prediction
+# Prediction Button
 # ================================
-if st.button("🔍 Predict"):
+if st.button("🔍 Predict Now"):
+
     input_data = np.array([[pregnancies, glucose, bp, skin, insulin, bmi, dpf, age]])
     input_scaled = scaler.transform(input_data)
 
@@ -85,22 +134,29 @@ if st.button("🔍 Predict"):
 
     result = "High Risk" if prediction[0] == 1 else "Low Risk"
 
-    # Result Display
+    # Result Card
     if prediction[0] == 1:
-        st.error(f"⚠️ {name}, You have High Risk of Diabetes")
+        st.markdown(f"""
+        <div style='background:#ffcccc; padding:20px; border-radius:10px;'>
+        <h2 style='color:red;'>⚠️ {name} - High Risk of Diabetes</h2>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        st.success(f"✅ {name}, You have Low Risk of Diabetes")
+        st.markdown(f"""
+        <div style='background:#ccffcc; padding:20px; border-radius:10px;'>
+        <h2 style='color:green;'>✅ {name} - Low Risk of Diabetes</h2>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.write("### 📊 Probability:")
+    st.write("### 📊 Probability")
     st.write(probability)
 
     # ================================
-    # Feature Importance (Explanation)
+    # Feature Importance Chart
     # ================================
-    st.write("### 🔍 Explanation (Feature Importance)")
+    st.subheader("🔍 Feature Importance")
 
     importance = model.feature_importances_
-
     importance_df = pd.DataFrame({
         "Feature": X.columns,
         "Importance": importance
@@ -112,34 +168,21 @@ if st.button("🔍 Predict"):
     st.pyplot(fig)
 
     # ================================
-    # Data Visualization
+    # Extra Visualization
     # ================================
-    st.subheader("📈 Glucose Distribution")
+    st.subheader("📈 Glucose Trend")
     st.line_chart(df["Glucose"])
 
     # ================================
     # Download Report
     # ================================
-    st.subheader("📄 Download Report")
-
     report = f"""
     AI Healthcare Report
-    ---------------------
     Name: {name}
     Date: {datetime.now()}
 
-    Prediction: {result}
+    Result: {result}
     Probability: {probability}
-
-    Input Values:
-    Pregnancies: {pregnancies}
-    Glucose: {glucose}
-    Blood Pressure: {bp}
-    Skin Thickness: {skin}
-    Insulin: {insulin}
-    BMI: {bmi}
-    DPF: {dpf}
-    Age: {age}
     """
 
-    st.download_button("📥 Download Report", report, file_name="health_report.txt")
+    st.download_button("📄 Download Report", report, file_name="report.txt")
