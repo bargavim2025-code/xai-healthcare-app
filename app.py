@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.#pyplot as plt
 from datetime import datetime
 from io import BytesIO
 
@@ -68,39 +68,72 @@ if menu == "Home":
         use_container_width=True
     )
 
+     ================================
+    
+
     # ================================
-    # SPECIALITIES SECTION
-    # ================================
-    st.markdown("## 🩺 Specialities")
+# SPECIALITIES SECTION (INTERACTIVE)
+# ================================
+st.markdown("## 🩺 Specialities")
 
-    col1, col2, col3 = st.columns(3)
+speciality = st.radio(
+    "Select a Speciality",
+    ["Critical Care", "ENT", "Orthopedics", "Cardiology", "General Surgery", "Diabetes Care"],
+    horizontal=True
+)
 
-    with col1:
-        st.image("https://cdn-icons-png.flaticon.com/512/2966/2966483.png", width=100)
-        st.markdown("### Critical Care")
+# ================================
+# DOCTOR DATA
+# ================================
+doctors = {
+    "Critical Care": [
+        ("Dr. Karthik Raj", "+91 90123 45678"),
+        ("Dr. Meena Das", "+91 91234 56789")
+    ],
+    "ENT": [
+        ("Dr. Suresh Kumar", "+91 92345 67890"),
+        ("Dr. Anjali Verma", "+91 93456 78901")
+    ],
+    "Orthopedics": [
+        ("Dr. Arjun Mehta", "+91 94567 89012"),
+        ("Dr. Vikram Singh", "+91 95678 90123")
+    ],
+    "Cardiology": [
+        ("Dr. Ravi Kumar", "+91 96789 01234"),
+        ("Dr. Neha Sharma", "+91 97890 12345")
+    ],
+    "General Surgery": [
+        ("Dr. Rajesh Patel", "+91 98901 23456"),
+        ("Dr. Deepa Nair", "+91 99012 34567")
+    ],
+    "Diabetes Care": [
+        ("Dr. Priya Sharma", "+91 90111 22334"),
+        ("Dr. Mohan Iyer", "+91 91222 33445")
+    ]
+}
 
-    with col2:
-        st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=100)
-        st.markdown("### ENT")
+# ================================
+# DISPLAY DOCTORS BASED ON SELECTION
+# ================================
+st.markdown(f"### 👨‍⚕️ Doctors - {speciality}")
 
-    with col3:
-        st.image("https://cdn-icons-png.flaticon.com/512/4320/4320371.png", width=100)
-        st.markdown("### Orthopedics")
+col1, col2 = st.columns(2)
 
-    col4, col5, col6 = st.columns(3)
+doc_list = doctors[speciality]
 
-    with col4:
-        st.image("https://cdn-icons-png.flaticon.com/512/2966/2966334.png", width=100)
-        st.markdown("### General Surgery")
+with col1:
+    st.markdown(f"""
+    **{doc_list[0][0]}**  
+    📞 {doc_list[0][1]}  
+    Experience: 10+ years
+    """)
 
-    with col5:
-        st.image("https://cdn-icons-png.flaticon.com/512/3209/3209265.png", width=100)
-        st.markdown("### Cardiology")
-
-    with col6:
-        st.image("https://cdn-icons-png.flaticon.com/512/3870/3870822.png", width=100)
-        st.markdown("### Diabetes Care")
-
+with col2:
+    st.markdown(f"""
+    **{doc_list[1][0]}**  
+    📞 {doc_list[1][1]}  
+    Experience: 8+ years
+    """)
     # ================================
     # ADDRESS
     # ================================
