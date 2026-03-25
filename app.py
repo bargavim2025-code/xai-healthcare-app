@@ -54,11 +54,10 @@ accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
 # ================================
 # HOME
 # ================================
-
 if menu == "Home":
 
-    st.markdown("<h1 style='text-align:center; color:#6a1b9a;'>🏥 Well Diagnosis</h1>", unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align:center;'>Advanced Multi-Speciality Hospital</h4>", unsafe_allow_html=True)
+    st.title("🏥 Well Diagnosis")
+    st.subheader("Advanced Multi-Speciality Hospital")
 
     # ================================
     # Banner Image
@@ -68,104 +67,108 @@ if menu == "Home":
         use_container_width=True
     )
 
-     ================================
-    
+    # ================================
+    # SPECIALITIES
+    # ================================
+    st.markdown("## 🩺 Specialities")
+
+    speciality = st.radio(
+        "Select a Speciality",
+        ["Critical Care", "ENT", "Orthopedics", "Cardiology", "General Surgery", "Diabetes Care"],
+        horizontal=True
+    )
 
     # ================================
-# SPECIALITIES SECTION (INTERACTIVE)
-# ================================
-st.markdown("## 🩺 Specialities")
+    # DOCTOR DATA
+    # ================================
+    doctors = {
+        "Critical Care": [
+            ("Dr. Karthik Raj", "+91 90123 45678"),
+            ("Dr. Meena Das", "+91 91234 56789")
+        ],
+        "ENT": [
+            ("Dr. Suresh Kumar", "+91 92345 67890"),
+            ("Dr. Anjali Verma", "+91 93456 78901")
+        ],
+        "Orthopedics": [
+            ("Dr. Arjun Mehta", "+91 94567 89012"),
+            ("Dr. Vikram Singh", "+91 95678 90123")
+        ],
+        "Cardiology": [
+            ("Dr. Ravi Kumar", "+91 96789 01234"),
+            ("Dr. Neha Sharma", "+91 97890 12345")
+        ],
+        "General Surgery": [
+            ("Dr. Rajesh Patel", "+91 98901 23456"),
+            ("Dr. Deepa Nair", "+91 99012 34567")
+        ],
+        "Diabetes Care": [
+            ("Dr. Priya Sharma", "+91 90111 22334"),
+            ("Dr. Mohan Iyer", "+91 91222 33445")
+        ]
+    }
 
-speciality = st.radio(
-    "Select a Speciality",
-    ["Critical Care", "ENT", "Orthopedics", "Cardiology", "General Surgery", "Diabetes Care"],
-    horizontal=True
-)
+    # ================================
+    # SHOW DOCTORS
+    # ================================
+    st.markdown(f"### 👨‍⚕️ Doctors - {speciality}")
 
-# ================================
-# DOCTOR DATA
-# ================================
-doctors = {
-    "Critical Care": [
-        ("Dr. Karthik Raj", "+91 90123 45678"),
-        ("Dr. Meena Das", "+91 91234 56789")
-    ],
-    "ENT": [
-        ("Dr. Suresh Kumar", "+91 92345 67890"),
-        ("Dr. Anjali Verma", "+91 93456 78901")
-    ],
-    "Orthopedics": [
-        ("Dr. Arjun Mehta", "+91 94567 89012"),
-        ("Dr. Vikram Singh", "+91 95678 90123")
-    ],
-    "Cardiology": [
-        ("Dr. Ravi Kumar", "+91 96789 01234"),
-        ("Dr. Neha Sharma", "+91 97890 12345")
-    ],
-    "General Surgery": [
-        ("Dr. Rajesh Patel", "+91 98901 23456"),
-        ("Dr. Deepa Nair", "+91 99012 34567")
-    ],
-    "Diabetes Care": [
-        ("Dr. Priya Sharma", "+91 90111 22334"),
-        ("Dr. Mohan Iyer", "+91 91222 33445")
-    ]
-}
+    doc_list = doctors[speciality]
 
-# ================================
-# DISPLAY DOCTORS BASED ON SELECTION
-# ================================
-st.markdown(f"### 👨‍⚕️ Doctors - {speciality}")
+    col1, col2 = st.columns(2)
 
-col1, col2 = st.columns(2)
+    with col1:
+        st.info(f"""
+        👨‍⚕️ {doc_list[0][0]}  
+        📞 {doc_list[0][1]}  
+        Experience: 10+ years
+        """)
 
-doc_list = doctors[speciality]
+    with col2:
+        st.info(f"""
+        👨‍⚕️ {doc_list[1][0]}  
+        📞 {doc_list[1][1]}  
+        Experience: 8+ years
+        """)
 
-with col1:
-    st.markdown(f"""
-    **{doc_list[0][0]}**  
-    📞 {doc_list[0][1]}  
-    Experience: 10+ years
-    """)
+    # ================================
+    # BOOK APPOINTMENT
+    # ================================
+    st.markdown("## 📅 Book Appointment")
 
-with col2:
-    st.markdown(f"""
-    **{doc_list[1][0]}**  
-    📞 {doc_list[1][1]}  
-    Experience: 8+ years
-    """)
+    pname = st.text_input("Patient Name", key="pname")
+    phone = st.text_input("Phone Number", key="phone")
+
+    doctor_names = [doc[0] for doc in doc_list]
+
+    selected_doctor = st.selectbox(
+        "Select Doctor",
+        doctor_names,
+        key="doctor_select"
+    )
+
+    date = st.date_input("Appointment Date", key="date")
+
+    if st.button("Book Appointment", key="book_btn"):
+        if pname and phone:
+            st.success(f"✅ Appointment booked with {selected_doctor} on {date}")
+        else:
+            st.warning("⚠️ Please fill all details")
+
     # ================================
     # ADDRESS
     # ================================
     st.markdown("## 📍 Address")
-    st.info("""
+    st.success("""
     Well Diagnosis  
     Anna Nagar, Chennai  
-    Phone: +91 98765 43210  
-    Email: welldiagnosis@gmail.com  
+    📞 +91 98765 43210  
+    ✉️ welldiagnosis@gmail.com  
     """)
 
-    # ================================
-    # BOOK APPOINTMENT SECTION
-    # ================================
-    st.markdown("## 📅 Book Appointment")
+    
 
-    with st.form("appointment_form"):
-        pname = st.text_input("Patient Name")
-        phone = st.text_input("Phone Number")
-        doctor = st.selectbox("Select Doctor", [
-            "Dr. Ravi Kumar (Cardiologist)",
-            "Dr. Priya Sharma (Diabetologist)",
-            "Dr. Arjun Mehta (General Physician)"
-        ])
-        date = st.date_input("Appointment Date")
 
-        submit = st.form_submit_button("Book Appointment")
-
-        if submit:
-            st.success(f"✅ Appointment booked for {pname} with {doctor} on {date}")
-
-            st.write("📞 Our team will contact you shortly.")
 elif menu == "Prediction":
 
     st.title("🔍 Diabetes Prediction")
