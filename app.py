@@ -79,5 +79,8 @@ if st.button("Predict"):
     st.write("### 🔍 Explanation (SHAP)")
     
     fig, ax = plt.subplots()
-    shap.bar_plot(shap_values[1][0], feature_names=X.columns)
+    shap_values_single = explainer(input_scaled)
+
+    fig, ax = plt.subplots()
+    shap.plots.bar(shap_values_single[0])
     st.pyplot(fig)
