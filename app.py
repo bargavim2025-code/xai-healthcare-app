@@ -54,79 +54,85 @@ accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
 # ================================
 # HOME
 # ================================
+
 if menu == "Home":
 
-    st.title("🏥 Well Diagnosis")
-    st.subheader("Advanced AI Healthcare Center")
+    st.markdown("<h1 style='text-align:center; color:#6a1b9a;'>🏥 Well Diagnosis</h1>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align:center;'>Advanced Multi-Speciality Hospital</h4>", unsafe_allow_html=True)
 
     # ================================
-    # Hospital Image
+    # Banner Image
     # ================================
     st.image(
-        "https://images.unsplash.com/photo-1586773860418-d37222d8fce3",
+        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f",
         use_container_width=True
     )
 
     # ================================
-    # Address Section
+    # SPECIALITIES SECTION
     # ================================
-    st.markdown("### 📍 Address")
-    st.write("""
-    Well Diagnosis Center  
-    No. 24, Anna Nagar Main Road  
-    Chennai, Tamil Nadu - 600040  
+    st.markdown("## 🩺 Specialities")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.image("https://cdn-icons-png.flaticon.com/512/2966/2966483.png", width=100)
+        st.markdown("### Critical Care")
+
+    with col2:
+        st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=100)
+        st.markdown("### ENT")
+
+    with col3:
+        st.image("https://cdn-icons-png.flaticon.com/512/4320/4320371.png", width=100)
+        st.markdown("### Orthopedics")
+
+    col4, col5, col6 = st.columns(3)
+
+    with col4:
+        st.image("https://cdn-icons-png.flaticon.com/512/2966/2966334.png", width=100)
+        st.markdown("### General Surgery")
+
+    with col5:
+        st.image("https://cdn-icons-png.flaticon.com/512/3209/3209265.png", width=100)
+        st.markdown("### Cardiology")
+
+    with col6:
+        st.image("https://cdn-icons-png.flaticon.com/512/3870/3870822.png", width=100)
+        st.markdown("### Diabetes Care")
+
+    # ================================
+    # ADDRESS
+    # ================================
+    st.markdown("## 📍 Address")
+    st.info("""
+    Well Diagnosis  
+    Anna Nagar, Chennai  
     Phone: +91 98765 43210  
     Email: welldiagnosis@gmail.com  
     """)
 
     # ================================
-    # Doctor Details
+    # BOOK APPOINTMENT SECTION
     # ================================
-    st.markdown("### 👨‍⚕️ Our Specialists")
+    st.markdown("## 📅 Book Appointment")
 
-    col1, col2, col3 = st.columns(3)
+    with st.form("appointment_form"):
+        pname = st.text_input("Patient Name")
+        phone = st.text_input("Phone Number")
+        doctor = st.selectbox("Select Doctor", [
+            "Dr. Ravi Kumar (Cardiologist)",
+            "Dr. Priya Sharma (Diabetologist)",
+            "Dr. Arjun Mehta (General Physician)"
+        ])
+        date = st.date_input("Appointment Date")
 
-    with col1:
-        st.markdown("""
-        **Dr. Ravi Kumar**  
-        Cardiologist  
-        📞 +91 91234 56789  
-        Experience: 15 years
-        """)
+        submit = st.form_submit_button("Book Appointment")
 
-    with col2:
-        st.markdown("""
-        **Dr. Priya Sharma**  
-        Diabetologist  
-        📞 +91 92345 67890  
-        Experience: 12 years
-        """)
+        if submit:
+            st.success(f"✅ Appointment booked for {pname} with {doctor} on {date}")
 
-    with col3:
-        st.markdown("""
-        **Dr. Arjun Mehta**  
-        General Physician  
-        📞 +91 93456 78901  
-        Experience: 10 years
-        """)
-
-    # ================================
-    # Model Accuracy Card
-    # ================================
-    st.markdown("### 📊 System Performance")
-    st.success(f"Model Accuracy: {accuracy:.2f}")
-
-    # ================================
-    # About Hospital
-    # ================================
-    st.markdown("### ℹ️ About Us")
-    st.write("""
-    Well Diagnosis is an AI-powered healthcare center that provides 
-    intelligent disease prediction and decision support systems.  
-
-    Our goal is to assist doctors and improve patient care using 
-    modern machine learning and Explainable AI techniques.
-    """)
+            st.write("📞 Our team will contact you shortly.")
 elif menu == "Prediction":
 
     st.title("🔍 Diabetes Prediction")
