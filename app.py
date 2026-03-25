@@ -56,11 +56,39 @@ accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
 # ================================
 if menu == "Home":
 
-    st.title("🏥 Well Diagnosis")
-    st.subheader("Advanced Multi-Speciality Hospital")
+    # ================================
+    # NAVY BLUE THEME CSS
+    # ================================
+    st.markdown("""
+    <style>
+    .main {
+        background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+        color: white;
+    }
+
+    h1, h2, h3, h4 {
+        color: white;
+    }
+
+    .card {
+        background-color: white;
+        color: black;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
     # ================================
-    # Banner Image
+    # TITLE
+    # ================================
+    st.markdown("<h1 style='text-align:center;'>🏥 Well Diagnosis</h1>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align:center;'>Advanced Multi-Speciality Hospital</h4>", unsafe_allow_html=True)
+
+    # ================================
+    # BANNER
     # ================================
     st.image(
         "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f",
@@ -68,106 +96,127 @@ if menu == "Home":
     )
 
     # ================================
-    # SPECIALITIES
+    # SPECIALITIES WITH ICONS
     # ================================
     st.markdown("## 🩺 Specialities")
 
-    speciality = st.radio(
-        "Select a Speciality",
-        ["Critical Care", "ENT", "Orthopedics", "Cardiology", "General Surgery", "Diabetes Care"],
-        horizontal=True
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("""
+        <div class='card'>
+        <img src='https://cdn-icons-png.flaticon.com/512/2966/2966483.png' width='80'>
+        <h4>Critical Care</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("""
+        <div class='card'>
+        <img src='https://cdn-icons-png.flaticon.com/512/3774/3774299.png' width='80'>
+        <h4>ENT</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
+        st.markdown("""
+        <div class='card'>
+        <img src='https://cdn-icons-png.flaticon.com/512/4320/4320371.png' width='80'>
+        <h4>Orthopedics</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+    col4, col5, col6 = st.columns(3)
+
+    with col4:
+        st.markdown("""
+        <div class='card'>
+        <img src='https://cdn-icons-png.flaticon.com/512/2966/2966334.png' width='80'>
+        <h4>General Surgery</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col5:
+        st.markdown("""
+        <div class='card'>
+        <img src='https://cdn-icons-png.flaticon.com/512/3209/3209265.png' width='80'>
+        <h4>Cardiology</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col6:
+        st.markdown("""
+        <div class='card'>
+        <img src='https://cdn-icons-png.flaticon.com/512/3870/3870822.png' width='80'>
+        <h4>Diabetes Care</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ================================
+    # SELECT SPECIALITY
+    # ================================
+    st.markdown("## 🔍 Select Speciality")
+
+    speciality = st.selectbox(
+        "Choose",
+        ["Critical Care", "ENT", "Orthopedics", "Cardiology", "General Surgery", "Diabetes Care"]
     )
 
     # ================================
-    # DOCTOR DATA
+    # DOCTORS DATA
     # ================================
     doctors = {
-        "Critical Care": [
-            ("Dr. Karthik Raj", "+91 90123 45678"),
-            ("Dr. Meena Das", "+91 91234 56789")
-        ],
-        "ENT": [
-            ("Dr. Suresh Kumar", "+91 92345 67890"),
-            ("Dr. Anjali Verma", "+91 93456 78901")
-        ],
-        "Orthopedics": [
-            ("Dr. Arjun Mehta", "+91 94567 89012"),
-            ("Dr. Vikram Singh", "+91 95678 90123")
-        ],
-        "Cardiology": [
-            ("Dr. Ravi Kumar", "+91 96789 01234"),
-            ("Dr. Neha Sharma", "+91 97890 12345")
-        ],
-        "General Surgery": [
-            ("Dr. Rajesh Patel", "+91 98901 23456"),
-            ("Dr. Deepa Nair", "+91 99012 34567")
-        ],
-        "Diabetes Care": [
-            ("Dr. Priya Sharma", "+91 90111 22334"),
-            ("Dr. Mohan Iyer", "+91 91222 33445")
-        ]
+        "Critical Care": [("Dr. Karthik Raj", "+91 90123 45678"),
+                          ("Dr. Meena Das", "+91 91234 56789")],
+        "ENT": [("Dr. Suresh Kumar", "+91 92345 67890"),
+                ("Dr. Anjali Verma", "+91 93456 78901")],
+        "Orthopedics": [("Dr. Arjun Mehta", "+91 94567 89012"),
+                        ("Dr. Vikram Singh", "+91 95678 90123")],
+        "Cardiology": [("Dr. Ravi Kumar", "+91 96789 01234"),
+                       ("Dr. Neha Sharma", "+91 97890 12345")],
+        "General Surgery": [("Dr. Rajesh Patel", "+91 98901 23456"),
+                            ("Dr. Deepa Nair", "+91 99012 34567")],
+        "Diabetes Care": [("Dr. Priya Sharma", "+91 90111 22334"),
+                          ("Dr. Mohan Iyer", "+91 91222 33445")]
     }
 
-    # ================================
-    # SHOW DOCTORS
-    # ================================
     st.markdown(f"### 👨‍⚕️ Doctors - {speciality}")
 
+    colA, colB = st.columns(2)
     doc_list = doctors[speciality]
 
-    col1, col2 = st.columns(2)
+    with colA:
+        st.info(f"{doc_list[0][0]}  \n📞 {doc_list[0][1]}")
 
-    with col1:
-        st.info(f"""
-        👨‍⚕️ {doc_list[0][0]}  
-        📞 {doc_list[0][1]}  
-        Experience: 10+ years
-        """)
-
-    with col2:
-        st.info(f"""
-        👨‍⚕️ {doc_list[1][0]}  
-        📞 {doc_list[1][1]}  
-        Experience: 8+ years
-        """)
+    with colB:
+        st.info(f"{doc_list[1][0]}  \n📞 {doc_list[1][1]}")
 
     # ================================
     # BOOK APPOINTMENT
     # ================================
     st.markdown("## 📅 Book Appointment")
 
-    pname = st.text_input("Patient Name", key="pname")
-    phone = st.text_input("Phone Number", key="phone")
+    pname = st.text_input("Patient Name")
+    phone = st.text_input("Phone Number")
+    selected_doctor = st.selectbox("Select Doctor", [doc[0] for doc in doc_list])
+    date = st.date_input("Date")
 
-    doctor_names = [doc[0] for doc in doc_list]
-
-    selected_doctor = st.selectbox(
-        "Select Doctor",
-        doctor_names,
-        key="doctor_select"
-    )
-
-    date = st.date_input("Appointment Date", key="date")
-
-    if st.button("Book Appointment", key="book_btn"):
+    if st.button("Book Appointment"):
         if pname and phone:
             st.success(f"✅ Appointment booked with {selected_doctor} on {date}")
         else:
-            st.warning("⚠️ Please fill all details")
+            st.warning("⚠️ Fill all details")
 
     # ================================
     # ADDRESS
     # ================================
     st.markdown("## 📍 Address")
-    st.success("""
+    st.write("""
     Well Diagnosis  
     Anna Nagar, Chennai  
     📞 +91 98765 43210  
     ✉️ welldiagnosis@gmail.com  
     """)
-
-    
-
 
 elif menu == "Prediction":
 
