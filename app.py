@@ -55,14 +55,78 @@ accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
 # HOME
 # ================================
 if menu == "Home":
-    st.title("🏥 Kavi Diagnosis")
-    st.write("AI-Based Healthcare Decision System")
 
+    st.title("🏥 Well Diagnosis")
+    st.subheader("Advanced AI Healthcare Center")
+
+    # ================================
+    # Hospital Image
+    # ================================
+    st.image(
+        "https://images.unsplash.com/photo-1586773860418-d37222d8fce3",
+        use_container_width=True
+    )
+
+    # ================================
+    # Address Section
+    # ================================
+    st.markdown("### 📍 Address")
+    st.write("""
+    Well Diagnosis Center  
+    No. 24, Anna Nagar Main Road  
+    Chennai, Tamil Nadu - 600040  
+    Phone: +91 98765 43210  
+    Email: welldiagnosis@gmail.com  
+    """)
+
+    # ================================
+    # Doctor Details
+    # ================================
+    st.markdown("### 👨‍⚕️ Our Specialists")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("""
+        **Dr. Ravi Kumar**  
+        Cardiologist  
+        📞 +91 91234 56789  
+        Experience: 15 years
+        """)
+
+    with col2:
+        st.markdown("""
+        **Dr. Priya Sharma**  
+        Diabetologist  
+        📞 +91 92345 67890  
+        Experience: 12 years
+        """)
+
+    with col3:
+        st.markdown("""
+        **Dr. Arjun Mehta**  
+        General Physician  
+        📞 +91 93456 78901  
+        Experience: 10 years
+        """)
+
+    # ================================
+    # Model Accuracy Card
+    # ================================
+    st.markdown("### 📊 System Performance")
     st.success(f"Model Accuracy: {accuracy:.2f}")
 
-# ================================
-# PREDICTION
-# ================================
+    # ================================
+    # About Hospital
+    # ================================
+    st.markdown("### ℹ️ About Us")
+    st.write("""
+    Well Diagnosis is an AI-powered healthcare center that provides 
+    intelligent disease prediction and decision support systems.  
+
+    Our goal is to assist doctors and improve patient care using 
+    modern machine learning and Explainable AI techniques.
+    """)
 elif menu == "Prediction":
 
     st.title("🔍 Diabetes Prediction")
