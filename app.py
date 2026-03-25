@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
+from io import BytesIO
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -17,32 +18,6 @@ from reportlab.lib.styles import getSampleStyleSheet
 # Page Config
 # ================================
 st.set_page_config(page_title="Kavi Diagnosis", layout="wide")
-
-# ================================
-# Custom CSS (Dashboard UI)
-# ================================
-st.markdown("""
-<style>
-body {
-    background-color: #eef2f7;
-}
-
-.sidebar .sidebar-content {
-    background: linear-gradient(#4facfe, #00f2fe);
-}
-
-h1, h2, h3 {
-    color: #2c3e50;
-}
-
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-}
-</style>
-""", unsafe_allow_html=True)
 
 # ================================
 # Sidebar
@@ -77,21 +52,16 @@ model.fit(X_train_scaled, y_train)
 accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
 
 # ================================
-# HOME PAGE
+# HOME
 # ================================
 if menu == "Home":
-    st.title("🏥 Welcome to Kavi Diagnosis")
-    st.markdown("### AI-Based Healthcare Decision Support System")
+    st.title("🏥 Kavi Diagnosis")
+    st.write("AI-Based Healthcare Decision System")
 
-    st.markdown(f"""
-    <div class='card'>
-    <h3>📊 Model Accuracy</h3>
-    <h2 style='color:green;'>{accuracy:.2f}</h2>
-    </div>
-    """, unsafe_allow_html=True)
+    st.success(f"Model Accuracy: {accuracy:.2f}")
 
 # ================================
-# PREDICTION PAGE
+# PREDICTION
 # ================================
 elif menu == "Prediction":
 
@@ -123,16 +93,15 @@ elif menu == "Prediction":
 
         result = "High Risk" if prediction[0] == 1 else "Low Risk"
 
-        # Result Card
         if prediction[0] == 1:
             st.error(f"⚠️ {name} - High Risk of Diabetes")
         else:
             st.success(f"✅ {name} - Low Risk of Diabetes")
 
-        st.write("### Probability:", probability)
+        st.write("Probability:", probability)
 
         # Feature Importance
-        st.subheader("📊 Feature Importance")
+        st.subheader("Feature Importance")
         importance = model.feature_importances_
 
         importance_df = pd.DataFrame({
@@ -145,10 +114,11 @@ elif menu == "Prediction":
         st.pyplot(fig)
 
         # ================================
-        # PDF REPORT GENERATION
+        # FIXED PDF (IN-MEMORY)
         # ================================
         def create_pdf():
-            doc = SimpleDocTemplate("report.pdf")
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer)
             styles = getSampleStyleSheet()
 
             content = []
@@ -164,20 +134,21 @@ elif menu == "Prediction":
             content.append(Paragraph(f"Probability: {probability}", styles['Normal']))
 
             doc.build(content)
+            buffer.seek(0)
+            return buffer
 
-        create_pdf()
+        pdf_file = create_pdf()
 
-        with open("report.pdf", "rb") as file:
-            st.download_button("📄 Download PDF Report", file, file_name="report.pdf")
+        st.download_button(
+            label="📄 Download PDF Report",
+            data=pdf_file,
+            file_name="report.pdf",
+            mime="application/pdf"
+        )
 
 # ================================
-# ABOUT PAGE
+# ABOUT
 # ================================
 elif menu == "About":
-    st.title("ℹ️ About")
-    st.write("""
-    This system uses Machine Learning and Explainable AI 
-    to predict diabetes risk and assist healthcare decisions.
-    
-    Developed for academic project.
-    """)
+    st.title("About")
+    st.write("AI healthcare system using machine learning.")
