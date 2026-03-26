@@ -526,14 +526,6 @@ elif menu == "About":
 
     ### ⚠️ Disclaimer
     This app is for educational purposes only and not a replacement for medical advice.
-
-    ### 🚀 Future Enhancements
-    - More diseases
-    - Appointment system
-    - Patient history tracking
-
-    ### 👨‍💻 Developer
-    Developed by: Your Name
     """)
     
     
