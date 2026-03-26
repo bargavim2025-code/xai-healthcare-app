@@ -17,12 +17,12 @@ from reportlab.lib.styles import getSampleStyleSheet
 # ================================
 # Page Config
 # ================================
-st.set_page_config(page_title="Kavi Diagnosis", layout="wide")
+st.set_page_config(page_title="well Diagnosis", layout="wide")
 
 # ================================
 # Sidebar
 # ================================
-st.sidebar.title("🏥 Kavi Diagnosis")
+st.sidebar.title("🏥 well Diagnosis")
 menu = st.sidebar.radio("Navigation", ["Home", "Prediction", "About"])
 
 # ================================
