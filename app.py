@@ -304,38 +304,35 @@ elif menu == "Prediction":
     # ================================
     # DIABETES
     # ================================
-    elif menu == "Prediction":
+   elif menu == "Prediction":
 
+    import numpy as np
     from io import BytesIO
+    from datetime import datetime
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
     from reportlab.lib.styles import getSampleStyleSheet
 
     # ================================
-    # HOSPITAL STYLE UI
+    # UI STYLE
     # ================================
     st.markdown("""
     <style>
-    .main {
-        background-color: #eef3f9;
-    }
-
+    .main {background-color: #eef3f9;}
     .header {
         background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
         padding: 20px;
         border-radius: 10px;
-        color: white;
+        color: yellow;
         text-align: center;
     }
-
     div[role="radiogroup"] > label {
         background-color: white;
-        padding: 10px 20px;
+        padding: 10px 15px;
         margin: 5px;
         border-radius: 10px;
         border: 1px solid #ccc;
         cursor: pointer;
     }
-
     div[role="radiogroup"] > label:hover {
         background-color: #2c5364;
         color: white;
@@ -362,11 +359,7 @@ elif menu == "Prediction":
         horizontal=True
     )
 
-    result = ""
-    cause = ""
-    treatment = ""
-    doctor = ""
-    medicine = ""
+    result, cause, treatment, doctor, medicine = "", "", "", "", ""
 
     # ================================
     # DIABETES
@@ -375,20 +368,24 @@ elif menu == "Prediction":
 
         glucose = st.number_input("Glucose Level", 0, 200, 120)
         bmi = st.number_input("BMI", 0.0, 60.0, 25.0)
+        age_d = st.number_input("Age Factor", 1, 120, 30)
+        family_history = st.selectbox("Family History", [0, 1])
 
         if st.button("Predict"):
             doctor = "Dr. Priya Sharma (Diabetologist)"
 
-            if glucose > 140 and bmi > 30:
+            score = (glucose > 140)*2 + (bmi > 30)*2 + (age_d > 45)*1 + (family_history == 1)*1
+
+            if score >= 4:
                 result = "High Risk of Diabetes"
-                cause = "High glucose and obesity"
-                treatment = "Daily exercise, strict sugar control"
+                cause = "High glucose, obesity, age factor, and genetic history"
+                treatment = "Strict diet control, daily exercise"
                 medicine = "Metformin / Insulin"
             else:
                 result = "Low Risk"
-                cause = "Normal glucose levels"
-                treatment = "Maintain diet"
-                medicine = "No medication"
+                cause = "Parameters within normal range"
+                treatment = "Maintain healthy lifestyle"
+                medicine = "None"
 
     # ================================
     # HEART
@@ -397,18 +394,22 @@ elif menu == "Prediction":
 
         chol = st.number_input("Cholesterol", 100, 400, 200)
         bp = st.number_input("Blood Pressure", 80, 200, 120)
+        age_h = st.number_input("Age", 1, 120, 45)
+        smoking = st.selectbox("Smoking", [0, 1])
 
         if st.button("Predict"):
             doctor = "Dr. Ravi Kumar (Cardiologist)"
 
-            if chol > 240 or bp > 140:
+            score = (chol > 240)*2 + (bp > 140)*2 + (age_h > 50)*1 + (smoking == 1)*2
+
+            if score >= 4:
                 result = "High Risk of Heart Disease"
-                cause = "High cholesterol/BP"
-                treatment = "Low-fat diet, stress management"
+                cause = "High cholesterol, BP, smoking habits, and age"
+                treatment = "Low-fat diet, exercise, avoid smoking"
                 medicine = "Aspirin, Statins"
             else:
                 result = "Low Risk"
-                cause = "Normal heart condition"
+                cause = "Normal cardiovascular parameters"
                 treatment = "Healthy lifestyle"
                 medicine = "None"
 
@@ -419,18 +420,22 @@ elif menu == "Prediction":
 
         temp = st.number_input("Body Temperature (°C)", 35.0, 42.0, 37.0)
         throat = st.selectbox("Throat Pain", [0, 1])
+        hearing = st.selectbox("Hearing Issue", [0, 1])
+        cold = st.selectbox("Cold/Cough", [0, 1])
 
         if st.button("Predict"):
             doctor = "Dr. Anjali Verma (ENT Specialist)"
 
-            if temp > 38 or throat == 1:
+            score = int(temp > 38) + throat + hearing + cold
+
+            if score >= 2:
                 result = "ENT Infection"
-                cause = "Fever and throat infection"
-                treatment = "Steam inhalation, rest"
+                cause = "Fever, throat pain, or ear-related symptoms"
+                treatment = "Steam inhalation, hydration"
                 medicine = "Paracetamol, Antibiotics"
             else:
                 result = "Normal"
-                cause = "No symptoms"
+                cause = "No significant symptoms"
                 treatment = "Maintain hygiene"
                 medicine = "None"
 
@@ -440,18 +445,20 @@ elif menu == "Prediction":
     elif disease == "Critical Condition":
 
         oxygen = st.number_input("Oxygen Level (%)", 50, 100, 95)
+        pulse = st.number_input("Pulse Rate", 40, 150, 80)
+        bp_c = st.number_input("Blood Pressure", 80, 200, 120)
 
         if st.button("Predict"):
             doctor = "Dr. Karthik Raj (Critical Care)"
 
-            if oxygen < 90:
+            if oxygen < 90 or pulse > 120 or bp_c > 180:
                 result = "Critical Condition"
-                cause = "Low oxygen level"
-                treatment = "Immediate ICU care"
-                medicine = "Oxygen therapy"
+                cause = "Low oxygen, high pulse or BP"
+                treatment = "Immediate ICU admission"
+                medicine = "Oxygen support, emergency drugs"
             else:
                 result = "Stable"
-                cause = "Normal vitals"
+                cause = "Vitals within normal range"
                 treatment = "Observation"
                 medicine = "None"
 
@@ -461,26 +468,32 @@ elif menu == "Prediction":
     elif disease == "General Surgery":
 
         pain = st.slider("Pain Level", 1, 10, 5)
+        swelling = st.selectbox("Swelling", [0, 1])
+        injury = st.selectbox("Recent Injury", [0, 1])
 
         if st.button("Predict"):
             doctor = "Dr. Rajesh Patel (Surgeon)"
 
-            if pain > 7:
+            score = pain + (swelling*2) + (injury*2)
+
+            if score > 8:
                 result = "Surgery Required"
-                cause = "Severe pain/injury"
+                cause = "Severe pain, swelling, or injury"
                 treatment = "Immediate surgical consultation"
                 medicine = "Painkillers"
             else:
                 result = "No Surgery Needed"
-                cause = "Mild condition"
+                cause = "Mild symptoms"
                 treatment = "Rest and medication"
                 medicine = "Ibuprofen"
 
     # ================================
     # OUTPUT + PDF
     # ================================
+    
     if result != "":
         st.subheader("🩺 Diagnosis Report")
+
         st.write(f"**Patient:** {name}")
         st.write(f"**Age:** {age_p}")
         st.write(f"**Disease:** {disease}")
@@ -510,158 +523,7 @@ elif menu == "Prediction":
             content.append(Paragraph(f"Treatment: {treatment}", styles['Normal']))
             content.append(Paragraph(f"Doctor: {doctor}", styles['Normal']))
             content.append(Paragraph(f"Medicines: {medicine}", styles['Normal']))
-
-            doc.build(content)
-            buffer.seek(0)
-            return buffer
-
-        pdf = create_pdf()
-
-        st.download_button(
-            "📄 Download Patient Report",
-            data=pdf,
-            file_name="report.pdf",
-            mime="application/pdf"
-        )
-    # ================================
-    # HEART
-    # ================================
-    elif disease == "Heart Disease":
-
-    chol = st.number_input("Cholesterol", 100, 400, 200)
-    bp = st.number_input("Blood Pressure", 80, 200, 120)
-    age_h = st.number_input("Age", 1, 120, 45)
-    smoking = st.selectbox("Smoking", [0, 1])
-
-    if st.button("Predict"):
-        doctor = "Dr. Ravi Kumar (Cardiologist)"
-
-        score = 0
-        if chol > 240:
-            score += 2
-        if bp > 140:
-            score += 2
-        if age_h > 50:
-            score += 1
-        if smoking == 1:
-            score += 2
-
-        if score >= 4:
-            result = "High Risk of Heart Disease"
-            cause = "High cholesterol, BP, smoking habits, and age"
-            treatment = "Low-fat diet, exercise, avoid smoking"
-            medicine = "Aspirin, Statins"
-        else:
-            result = "Low Risk"
-            cause = "Normal cardiovascular parameters"
-            treatment = "Maintain healthy lifestyle"
-            medicine = "None"
-
-    # ================================
-    # ENT
-    # ================================
-    elif disease == "ENT Disorder":
-
-    temp = st.number_input("Body Temperature (°C)", 35.0, 42.0, 37.0)
-    throat = st.selectbox("Throat Pain", [0, 1])
-    hearing = st.selectbox("Hearing Issue", [0, 1])
-    cold = st.selectbox("Cold/Cough", [0, 1])
-
-    if st.button("Predict"):
-        doctor = "Dr. Anjali Verma (ENT Specialist)"
-
-        score = temp > 38
-        score = int(score) + throat + hearing + cold
-
-        if score >= 2:
-            result = "ENT Infection"
-            cause = "Fever, throat pain, or ear-related symptoms"
-            treatment = "Steam inhalation, hydration"
-            medicine = "Paracetamol, Antibiotics"
-        else:
-            result = "Normal"
-            cause = "No significant symptoms"
-            treatment = "Maintain hygiene"
-            medicine = "None"
-    # CRITICAL
-    # ================================
-    elif disease == "Critical Condition":
-
-    oxygen = st.number_input("Oxygen Level (%)", 50, 100, 95)
-    pulse = st.number_input("Pulse Rate", 40, 150, 80)
-    bp_c = st.number_input("Blood Pressure", 80, 200, 120)
-
-    if st.button("Predict"):
-        doctor = "Dr. Karthik Raj (Critical Care)"
-
-        if oxygen < 90 or pulse > 120 or bp_c > 180:
-            result = "Critical Condition"
-            cause = "Low oxygen, high pulse or BP"
-            treatment = "Immediate ICU admission"
-            medicine = "Oxygen support, emergency drugs"
-        else:
-            result = "Stable"
-            cause = "Vitals within normal range"
-            treatment = "Observation"
-            medicine = "None"
-
-    # ================================
-    # SURGERY
-    # ================================
-    elif disease == "General Surgery":
-
-    pain = st.slider("Pain Level", 1, 10, 5)
-    swelling = st.selectbox("Swelling", [0, 1])
-    injury = st.selectbox("Recent Injury", [0, 1])
-
-    if st.button("Predict"):
-        doctor = "Dr. Rajesh Patel (Surgeon)"
-
-        score = pain + (swelling * 2) + (injury * 2)
-
-        if score > 8:
-            result = "Surgery Required"
-            cause = "Severe pain, swelling, or injury"
-            treatment = "Immediate surgical consultation"
-            medicine = "Painkillers"
-        else:
-            result = "No Surgery Needed"
-            cause = "Mild symptoms"
-            treatment = "Rest and medication"
-            medicine = "Ibuprofen"
-    # OUTPUT + PDF
-    # ================================
-    if result != "":
-        st.subheader("🩺 Diagnosis Report")
-        st.write(f"**Patient:** {name}")
-        st.write(f"**Age:** {age_p}")
-        st.write(f"**Disease:** {disease}")
-        st.write(f"**Result:** {result}")
-        st.write(f"**Cause:** {cause}")
-        st.write(f"**Treatment:** {treatment}")
-        st.write(f"**Doctor:** {doctor}")
-        st.write(f"**Medicines:** {medicine}")
-
-        # PDF
-        def create_pdf():
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(buffer)
-            styles = getSampleStyleSheet()
-
-            content = []
-            content.append(Paragraph("Well Diagnosis Hospital", styles['Title']))
-            content.append(Spacer(1, 12))
-
-            content.append(Paragraph(f"Patient: {name}", styles['Normal']))
-            content.append(Paragraph(f"Age: {age_p}", styles['Normal']))
-            content.append(Paragraph(f"Disease: {disease}", styles['Normal']))
-            content.append(Spacer(1, 12))
-
-            content.append(Paragraph(f"Result: {result}", styles['Normal']))
-            content.append(Paragraph(f"Cause: {cause}", styles['Normal']))
-            content.append(Paragraph(f"Treatment: {treatment}", styles['Normal']))
-            content.append(Paragraph(f"Doctor: {doctor}", styles['Normal']))
-            content.append(Paragraph(f"Medicines: {medicine}", styles['Normal']))
+            content.append(Paragraph(f"Date: {datetime.now()}", styles['Normal']))
 
             doc.build(content)
             buffer.seek(0)
