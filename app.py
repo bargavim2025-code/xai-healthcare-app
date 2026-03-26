@@ -239,125 +239,214 @@ if menu == "Home":
     """, unsafe_allow_html=True)
 elif menu == "Prediction":
 
-    st.title("🔍 Multi-Disease Prediction System")
+    from io import BytesIO
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
 
     # ================================
-    # SELECT DISEASE
+    # HOSPITAL STYLE UI
     # ================================
+    st.markdown("""
+    <style>
+    .main {
+        background-color: #eef3f9;
+    }
+
+    .header {
+        background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+    }
+
+    .card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='header'><h2>🔍 Smart Diagnosis - Well Diagnosis</h2></div>", unsafe_allow_html=True)
+
+    # ================================
+    # INPUT
+    # ================================
+    name = st.text_input("Patient Name")
+    age_p = st.number_input("Age", 1, 120, 30)
+
     disease = st.selectbox(
-        "Select Disease to Diagnose",
+        "Select Disease",
         ["Diabetes", "Heart Disease", "ENT Disorder", "Critical Condition", "General Surgery"]
     )
 
-    name = st.text_input("Patient Name")
+    result = ""
+    cause = ""
+    treatment = ""
+    doctor = ""
+    medicine = ""
 
     # ================================
-    # 1. DIABETES
+    # DIABETES
     # ================================
     if disease == "Diabetes":
 
-        st.subheader("🧪 Diabetes Parameters")
+        glucose = st.number_input("Glucose", 0, 200, 120)
+        bmi = st.number_input("BMI", 0.0, 60.0, 25.0)
 
-        col1, col2 = st.columns(2)
+        if st.button("Predict"):
+            doctor = "Dr. Priya Sharma (Diabetologist)"
 
-        with col1:
-            pregnancies = st.number_input("Pregnancies", 0, 20, 1)
-            glucose = st.number_input("Glucose", 0, 200, 120)
-            bp = st.number_input("Blood Pressure", 0, 150, 70)
-            skin = st.number_input("Skin Thickness", 0, 100, 20)
-
-        with col2:
-            insulin = st.number_input("Insulin", 0, 900, 80)
-            bmi = st.number_input("BMI", 0.0, 60.0, 25.0)
-            dpf = st.number_input("DPF", 0.0, 2.5, 0.5)
-            age = st.number_input("Age", 1, 120, 30)
-
-        if st.button("Predict Diabetes"):
-            input_data = np.array([[pregnancies, glucose, bp, skin, insulin, bmi, dpf, age]])
-            input_scaled = scaler.transform(input_data)
-            prediction = model.predict(input_scaled)
-
-            if prediction[0] == 1:
-                st.error(f"⚠️ {name} - High Risk of Diabetes")
+            if glucose > 140 and bmi > 30:
+                result = "High Risk of Diabetes"
+                cause = "High glucose and obesity"
+                treatment = "Regular exercise, strict diet control"
+                medicine = "Metformin, Insulin (consult doctor)"
             else:
-                st.success(f"✅ {name} - Low Risk of Diabetes")
+                result = "Low Risk of Diabetes"
+                cause = "Normal levels"
+                treatment = "Maintain healthy lifestyle"
+                medicine = "No medication required"
 
     # ================================
-    # 2. HEART DISEASE
+    # HEART
     # ================================
     elif disease == "Heart Disease":
 
-        st.subheader("❤️ Heart Parameters")
-
-        age_h = st.number_input("Age", 1, 120, 45)
         chol = st.number_input("Cholesterol", 100, 400, 200)
-        bp_h = st.number_input("Blood Pressure", 80, 200, 120)
-        hr = st.number_input("Heart Rate", 60, 200, 90)
+        bp = st.number_input("Blood Pressure", 80, 200, 120)
 
-        if st.button("Predict Heart Disease"):
-            risk = (chol + bp_h + age_h + hr) / 4
+        if st.button("Predict"):
+            doctor = "Dr. Ravi Kumar (Cardiologist)"
 
-            if risk > 160:
-                st.error(f"⚠️ {name} - High Risk of Heart Disease")
+            if chol > 240 or bp > 140:
+                result = "High Risk of Heart Disease"
+                cause = "High cholesterol/BP"
+                treatment = "Low-fat diet, exercise, stress control"
+                medicine = "Aspirin, Statins"
             else:
-                st.success(f"✅ {name} - Low Risk of Heart Disease")
+                result = "Low Risk"
+                cause = "Normal heart condition"
+                treatment = "Healthy lifestyle"
+                medicine = "No medication required"
 
     # ================================
-    # 3. ENT DISORDER
+    # ENT
     # ================================
     elif disease == "ENT Disorder":
 
-        st.subheader("👂 ENT Parameters")
+        temp = st.number_input("Body Temperature (°C)", 35.0, 42.0, 37.0)
+        throat = st.selectbox("Throat Pain", [0, 1])
 
-        fever = st.selectbox("Fever", [0, 1])
-        throat_pain = st.selectbox("Throat Pain", [0, 1])
-        hearing_loss = st.selectbox("Hearing Loss", [0, 1])
+        if st.button("Predict"):
+            doctor = "Dr. Anjali Verma (ENT Specialist)"
 
-        if st.button("Predict ENT Issue"):
-            score = fever + throat_pain + hearing_loss
-
-            if score >= 2:
-                st.error(f"⚠️ {name} - Possible ENT Disorder")
+            if temp > 38 or throat == 1:
+                result = "ENT Infection"
+                cause = "Fever and throat infection"
+                treatment = "Steam inhalation, rest"
+                medicine = "Paracetamol, Antibiotics"
             else:
-                st.success(f"✅ {name} - Normal Condition")
+                result = "Normal"
+                cause = "No symptoms"
+                treatment = "Maintain hygiene"
+                medicine = "None"
 
     # ================================
-    # 4. CRITICAL CONDITION
+    # CRITICAL
     # ================================
     elif disease == "Critical Condition":
 
-        st.subheader("🚑 Critical Care Parameters")
+        oxygen = st.number_input("Oxygen Level", 50, 100, 95)
 
-        oxygen = st.number_input("Oxygen Level (%)", 50, 100, 95)
-        pulse = st.number_input("Pulse Rate", 40, 150, 80)
-        consciousness = st.selectbox("Consciousness Level", ["Normal", "Drowsy", "Unconscious"])
+        if st.button("Predict"):
+            doctor = "Dr. Karthik Raj (Critical Care)"
 
-        if st.button("Check Condition"):
-            if oxygen < 90 or pulse > 120 or consciousness != "Normal":
-                st.error(f"🚨 {name} - Critical Condition! Immediate Care Needed")
+            if oxygen < 90:
+                result = "Critical Condition"
+                cause = "Low oxygen level"
+                treatment = "Immediate ICU support"
+                medicine = "Oxygen therapy"
             else:
-                st.success(f"✅ {name} - Stable Condition")
+                result = "Stable"
+                cause = "Normal vitals"
+                treatment = "Observation"
+                medicine = "None"
 
     # ================================
-    # 5. GENERAL SURGERY
+    # SURGERY
     # ================================
     elif disease == "General Surgery":
 
-        st.subheader("🔪 Surgery Evaluation")
+        pain = st.slider("Pain Level", 1, 10, 5)
 
-        pain_level = st.slider("Pain Level (1-10)", 1, 10, 5)
-        swelling = st.selectbox("Swelling", [0, 1])
-        injury = st.selectbox("Recent Injury", [0, 1])
+        if st.button("Predict"):
+            doctor = "Dr. Rajesh Patel (Surgeon)"
 
-        if st.button("Evaluate Surgery Need"):
-            score = pain_level + swelling*2 + injury*2
-
-            if score > 8:
-                st.error(f"⚠️ {name} - Surgery May Be Required")
+            if pain > 7:
+                result = "Surgery Required"
+                cause = "Severe pain"
+                treatment = "Immediate surgical consultation"
+                medicine = "Painkillers"
             else:
-                st.success(f"✅ {name} - No Immediate Surgery Needed")
-      
+                result = "No Surgery Needed"
+                cause = "Mild issue"
+                treatment = "Medication and rest"
+                medicine = "Ibuprofen"
 
+    # ================================
+    # OUTPUT
+    # ================================
+    if result != "":
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+        st.subheader("🩺 Diagnosis Report")
+        st.write(f"**Result:** {result}")
+        st.write(f"**Cause:** {cause}")
+        st.write(f"**Treatment:** {treatment}")
+        st.write(f"**Recommended Doctor:** {doctor}")
+        st.write(f"**Medicines:** {medicine}")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # ================================
+        # PDF REPORT
+        # ================================
+        def create_pdf():
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer)
+            styles = getSampleStyleSheet()
+
+            content = []
+
+            content.append(Paragraph("Well Diagnosis Hospital", styles['Title']))
+            content.append(Spacer(1, 12))
+
+            content.append(Paragraph(f"Patient: {name}", styles['Normal']))
+            content.append(Paragraph(f"Age: {age_p}", styles['Normal']))
+            content.append(Paragraph(f"Disease: {disease}", styles['Normal']))
+            content.append(Spacer(1, 12))
+
+            content.append(Paragraph(f"Result: {result}", styles['Normal']))
+            content.append(Paragraph(f"Cause: {cause}", styles['Normal']))
+            content.append(Paragraph(f"Treatment: {treatment}", styles['Normal']))
+            content.append(Paragraph(f"Doctor: {doctor}", styles['Normal']))
+            content.append(Paragraph(f"Medicines: {medicine}", styles['Normal']))
+
+            doc.build(content)
+            buffer.seek(0)
+            return buffer
+
+        pdf = create_pdf()
+
+        st.download_button(
+            "📄 Download Full Report",
+            data=pdf,
+            file_name="patient_report.pdf",
+            mime="application/pdf"
+        )
 # ================================
 # ABOUT
 # ================================
