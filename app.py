@@ -270,6 +270,17 @@ elif menu == "Prediction":
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='header'><h2>🔍 Smart Diagnosis - Well Diagnosis</h2></div>", unsafe_allow_html=True)
+    # ================================
+# DISEASE SELECTION (STYLED)
+# ================================
+st.markdown("## 🏥 Select Disease for Diagnosis")
+
+disease = st.radio(
+    "",
+    ["Diabetes", "Heart Disease", "ENT Disorder", "Critical Condition", "General Surgery"],
+    horizontal=True,
+    key="disease_select"
+)
 
     # ================================
     # INPUT
