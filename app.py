@@ -57,48 +57,57 @@ accuracy = accuracy_score(y_test, model.predict(X_test_scaled))
 if menu == "Home":
 
     # ================================
-    # NAVY BLUE THEME CSS
+    # PREMIUM CSS (WEBSITE STYLE)
     # ================================
     st.markdown("""
     <style>
     .main {
-        background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-        color: white;
+        background-color: #f4f8fb;
     }
 
-    h1, h2, h3, h4 {
+    .hero {
+        background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
         color: white;
     }
 
     .card {
-        background-color: white;
-        color: black;
-        padding: 15px;
-        border-radius: 12px;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
         text-align: center;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: 0.3s;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .section {
+        margin-top: 40px;
     }
     </style>
     """, unsafe_allow_html=True)
 
     # ================================
-    # TITLE
+    # HERO SECTION
     # ================================
-    st.markdown("<h1 style='text-align:center;'>🏥 Well Diagnosis</h1>", unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align:center;'>Advanced Multi-Speciality Hospital</h4>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class='hero'>
+        <h1>🏥 Well Diagnosis</h1>
+        <h3>Your Trusted Healthcare Partner</h3>
+        <p>Advanced AI-powered diagnosis and expert medical care</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ================================
-    # BANNER
+    # SPECIALITIES
     # ================================
-    st.image(
-        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f",
-        use_container_width=True
-    )
-
-    # ================================
-    # SPECIALITIES WITH ICONS
-    # ================================
-    st.markdown("## 🩺 Specialities")
+    st.markdown("<div class='section'>", unsafe_allow_html=True)
+    st.markdown("## 🩺 Our Specialities")
 
     col1, col2, col3 = st.columns(3)
 
@@ -152,19 +161,18 @@ if menu == "Home":
         </div>
         """, unsafe_allow_html=True)
 
+    st.markdown("</div>", unsafe_allow_html=True)
+
     # ================================
     # SELECT SPECIALITY
     # ================================
     st.markdown("## 🔍 Select Speciality")
 
     speciality = st.selectbox(
-        "Choose",
+        "",
         ["Critical Care", "ENT", "Orthopedics", "Cardiology", "General Surgery", "Diabetes Care"]
     )
 
-    # ================================
-    # DOCTORS DATA
-    # ================================
     doctors = {
         "Critical Care": [("Dr. Karthik Raj", "+91 90123 45678"),
                           ("Dr. Meena Das", "+91 91234 56789")],
@@ -186,10 +194,22 @@ if menu == "Home":
     doc_list = doctors[speciality]
 
     with colA:
-        st.info(f"{doc_list[0][0]}  \n📞 {doc_list[0][1]}")
+        st.markdown(f"""
+        <div class='card'>
+        <h4>{doc_list[0][0]}</h4>
+        <p>📞 {doc_list[0][1]}</p>
+        <p>Experience: 10+ years</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     with colB:
-        st.info(f"{doc_list[1][0]}  \n📞 {doc_list[1][1]}")
+        st.markdown(f"""
+        <div class='card'>
+        <h4>{doc_list[1][0]}</h4>
+        <p>📞 {doc_list[1][1]}</p>
+        <p>Experience: 8+ years</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     # ================================
     # BOOK APPOINTMENT
@@ -208,16 +228,15 @@ if menu == "Home":
             st.warning("⚠️ Fill all details")
 
     # ================================
-    # ADDRESS
+    # FOOTER
     # ================================
-    st.markdown("## 📍 Address")
-    st.write("""
-    Well Diagnosis  
-    Anna Nagar, Chennai  
-    📞 +91 98765 43210  
-    ✉️ welldiagnosis@gmail.com  
-    """)
-
+    st.markdown("""
+    <hr>
+    <center>
+    📍 Well Diagnosis, Anna Nagar, Chennai <br>
+    📞 +91 98765 43210 | ✉️ welldiagnosis@gmail.com
+    </center>
+    """, unsafe_allow_html=True)
 elif menu == "Prediction":
 
     st.title("🔍 Diabetes Prediction")
