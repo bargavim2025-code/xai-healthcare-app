@@ -260,37 +260,39 @@ elif menu == "Prediction":
         text-align: center;
     }
 
-    .card {
-        background: white;
-        padding: 15px;
+    div[role="radiogroup"] > label {
+        background-color: white;
+        padding: 10px 20px;
+        margin: 5px;
         border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    div[role="radiogroup"] > label:hover {
+        background-color: #2c5364;
+        color: white;
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='header'><h2>🔍 Smart Diagnosis - Well Diagnosis</h2></div>", unsafe_allow_html=True)
-    # ================================
-# DISEASE SELECTION (STYLED)
-# ================================
-st.markdown("## 🏥 Select Disease for Diagnosis")
-
-disease = st.radio(
-    "",
-    ["Diabetes", "Heart Disease", "ENT Disorder", "Critical Condition", "General Surgery"],
-    horizontal=True,
-    key="disease_select"
-)
 
     # ================================
-    # INPUT
+    # PATIENT DETAILS
     # ================================
     name = st.text_input("Patient Name")
     age_p = st.number_input("Age", 1, 120, 30)
 
-    disease = st.selectbox(
-        "Select Disease",
-        ["Diabetes", "Heart Disease", "ENT Disorder", "Critical Condition", "General Surgery"]
+    # ================================
+    # DISEASE SELECTION
+    # ================================
+    st.markdown("## 🏥 Select Disease")
+
+    disease = st.radio(
+        "",
+        ["Diabetes", "Heart Disease", "ENT Disorder", "Critical Condition", "General Surgery"],
+        horizontal=True
     )
 
     result = ""
@@ -304,7 +306,7 @@ disease = st.radio(
     # ================================
     if disease == "Diabetes":
 
-        glucose = st.number_input("Glucose", 0, 200, 120)
+        glucose = st.number_input("Glucose Level", 0, 200, 120)
         bmi = st.number_input("BMI", 0.0, 60.0, 25.0)
 
         if st.button("Predict"):
@@ -313,13 +315,13 @@ disease = st.radio(
             if glucose > 140 and bmi > 30:
                 result = "High Risk of Diabetes"
                 cause = "High glucose and obesity"
-                treatment = "Regular exercise, strict diet control"
-                medicine = "Metformin, Insulin (consult doctor)"
+                treatment = "Daily exercise, strict sugar control"
+                medicine = "Metformin / Insulin"
             else:
-                result = "Low Risk of Diabetes"
-                cause = "Normal levels"
-                treatment = "Maintain healthy lifestyle"
-                medicine = "No medication required"
+                result = "Low Risk"
+                cause = "Normal glucose levels"
+                treatment = "Maintain diet"
+                medicine = "No medication"
 
     # ================================
     # HEART
@@ -335,13 +337,13 @@ disease = st.radio(
             if chol > 240 or bp > 140:
                 result = "High Risk of Heart Disease"
                 cause = "High cholesterol/BP"
-                treatment = "Low-fat diet, exercise, stress control"
+                treatment = "Low-fat diet, stress management"
                 medicine = "Aspirin, Statins"
             else:
                 result = "Low Risk"
                 cause = "Normal heart condition"
                 treatment = "Healthy lifestyle"
-                medicine = "No medication required"
+                medicine = "None"
 
     # ================================
     # ENT
@@ -370,7 +372,7 @@ disease = st.radio(
     # ================================
     elif disease == "Critical Condition":
 
-        oxygen = st.number_input("Oxygen Level", 50, 100, 95)
+        oxygen = st.number_input("Oxygen Level (%)", 50, 100, 95)
 
         if st.button("Predict"):
             doctor = "Dr. Karthik Raj (Critical Care)"
@@ -378,7 +380,7 @@ disease = st.radio(
             if oxygen < 90:
                 result = "Critical Condition"
                 cause = "Low oxygen level"
-                treatment = "Immediate ICU support"
+                treatment = "Immediate ICU care"
                 medicine = "Oxygen therapy"
             else:
                 result = "Stable"
@@ -398,40 +400,36 @@ disease = st.radio(
 
             if pain > 7:
                 result = "Surgery Required"
-                cause = "Severe pain"
+                cause = "Severe pain/injury"
                 treatment = "Immediate surgical consultation"
                 medicine = "Painkillers"
             else:
                 result = "No Surgery Needed"
-                cause = "Mild issue"
-                treatment = "Medication and rest"
+                cause = "Mild condition"
+                treatment = "Rest and medication"
                 medicine = "Ibuprofen"
 
     # ================================
-    # OUTPUT
+    # OUTPUT + PDF
     # ================================
     if result != "":
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-
         st.subheader("🩺 Diagnosis Report")
+        st.write(f"**Patient:** {name}")
+        st.write(f"**Age:** {age_p}")
+        st.write(f"**Disease:** {disease}")
         st.write(f"**Result:** {result}")
         st.write(f"**Cause:** {cause}")
         st.write(f"**Treatment:** {treatment}")
-        st.write(f"**Recommended Doctor:** {doctor}")
+        st.write(f"**Doctor:** {doctor}")
         st.write(f"**Medicines:** {medicine}")
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # ================================
-        # PDF REPORT
-        # ================================
+        # PDF
         def create_pdf():
             buffer = BytesIO()
             doc = SimpleDocTemplate(buffer)
             styles = getSampleStyleSheet()
 
             content = []
-
             content.append(Paragraph("Well Diagnosis Hospital", styles['Title']))
             content.append(Spacer(1, 12))
 
@@ -453,9 +451,9 @@ disease = st.radio(
         pdf = create_pdf()
 
         st.download_button(
-            "📄 Download Full Report",
+            "📄 Download Patient Report",
             data=pdf,
-            file_name="patient_report.pdf",
+            file_name="report.pdf",
             mime="application/pdf"
         )
 # ================================
