@@ -490,5 +490,50 @@ elif menu == "Prediction":
 # ABOUT
 # ================================
 elif menu == "About":
-    st.title("About")
-    st.write("AI healthcare system using machine learning.")
+
+    st.title("🏥 About Well Diagnosis")
+
+    # ================================
+    # HOSPITAL IMAGE
+    # ================================
+    st.image("https://images.unsplash.com/photo-1586773860418-d37222d8fce3", 
+             caption="well diagnosis", use_container_width=True)
+
+    st.write("""
+    ### 🩺 Application Overview
+    This application is an AI-powered healthcare system that predicts diseases and provides diagnosis, treatment suggestions, and patient reports.
+
+    ### 🎯 Objective
+    To assist in early disease detection and provide quick medical insights.
+
+    ### 🧠 Features
+    - Multi-disease prediction
+    - Cause-based diagnosis
+    - Doctor recommendations
+    - Medicine suggestions
+    - Risk visualization
+    - PDF report generation
+
+    ### ⚙️ Technologies Used
+    - Python
+    - Streamlit
+    - Machine Learning
+    - Matplotlib
+    - ReportLab
+
+    ### 🔍 How It Works
+    Users input medical data → system analyzes → predicts disease → provides treatment and report.
+
+    ### ⚠️ Disclaimer
+    This app is for educational purposes only and not a replacement for medical advice.
+
+    ### 🚀 Future Enhancements
+    - More diseases
+    - Appointment system
+    - Patient history tracking
+
+    ### 👨‍💻 Developer
+    Developed by: Your Name
+    """)
+    
+    
