@@ -506,24 +506,6 @@ elif menu == "About":
     ### 🎯 Objective
     To assist in early disease detection and provide quick medical insights.
 
-    ### 🧠 Features
-    - Multi-disease prediction
-    - Cause-based diagnosis
-    - Doctor recommendations
-    - Medicine suggestions
-    - Risk visualization
-    - PDF report generation
-
-    ### ⚙️ Technologies Used
-    - Python
-    - Streamlit
-    - Machine Learning
-    - Matplotlib
-    - ReportLab
-
-    ### 🔍 How It Works
-    Users input medical data → system analyzes → predicts disease → provides treatment and report.
-
     ### ⚠️ Disclaimer
     This app is for educational purposes only and not a replacement for medical advice.
     """)
