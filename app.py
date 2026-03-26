@@ -460,33 +460,65 @@ elif menu == "Prediction":
         # PDF
         # ================================
         def create_pdf():
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(buffer)
-            styles = getSampleStyleSheet()
+         buffer = BytesIO()
 
-            content = []
-            content.append(Paragraph("Well Diagnosis Hospital", styles['Title']))
-            content.append(Spacer(1, 12))
+    # ================================
+    # CREATE CHART IMAGE
+    # ================================
+        fig, ax = plt.subplots()
+        ax.bar(["Risk"], [risk_value])
+        ax.set_ylim(0, 100)
 
-            content.append(Paragraph(f"Patient: {name}", styles['Normal']))
-            content.append(Paragraph(f"Age: {age_p}", styles['Normal']))
-            content.append(Paragraph(f"Disease: {disease}", styles['Normal']))
-            content.append(Spacer(1, 12))
+        chart_buffer = BytesIO()
+        fig.savefig(chart_buffer, format="png")
+        chart_buffer.seek(0)
 
-            content.append(Paragraph(f"Result: {result}", styles['Normal']))
-            content.append(Paragraph(f"Cause: {cause}", styles['Normal']))
-            content.append(Paragraph(f"Treatment: {treatment}", styles['Normal']))
-            content.append(Paragraph(f"Doctor: {doctor}", styles['Normal']))
-            content.append(Paragraph(f"Medicines: {medicine}", styles['Normal']))
-            content.append(Paragraph(f"Date: {datetime.now()}", styles['Normal']))
+    # ================================
+    # PDF CREATION
+    # ================================
+    doc = SimpleDocTemplate(buffer)
+    styles = getSampleStyleSheet()
 
-            doc.build(content)
-            buffer.seek(0)
-            return buffer
+    from reportlab.platypus import Image
 
-        pdf = create_pdf()
+    content = []
 
-        st.download_button("📄 Download Report", pdf, "report.pdf")  
+    # Hospital Title
+    content.append(Paragraph("🏥 Well Diagnosis Hospital", styles['Title']))
+    content.append(Spacer(1, 12))
+
+    # Patient Details
+    content.append(Paragraph(f"Patient Name: {name}", styles['Normal']))
+    content.append(Paragraph(f"Age: {age_p}", styles['Normal']))
+    content.append(Paragraph(f"Disease: {disease}", styles['Normal']))
+    content.append(Spacer(1, 12))
+
+    # Results
+    content.append(Paragraph(f"Result: {result}", styles['Normal']))
+    content.append(Paragraph(f"Cause: {cause}", styles['Normal']))
+    content.append(Paragraph(f"Treatment: {treatment}", styles['Normal']))
+    content.append(Paragraph(f"Doctor: {doctor}", styles['Normal']))
+    content.append(Paragraph(f"Medicines: {medicine}", styles['Normal']))
+    content.append(Spacer(1, 12))
+
+    # ================================
+    # ADD GRAPH TO PDF
+    # ================================
+    content.append(Paragraph("Risk Analysis Graph:", styles['Heading2']))
+    content.append(Spacer(1, 10))
+
+    img = Image(chart_buffer, width=400, height=250)
+    content.append(img)
+
+    content.append(Spacer(1, 12))
+
+    # Date
+    content.append(Paragraph(f"Date: {datetime.now()}", styles['Normal']))
+
+    doc.build(content)
+
+    buffer.seek(0)
+    return buffer  
 # ABOUT
 # ================================
 elif menu == "About":
