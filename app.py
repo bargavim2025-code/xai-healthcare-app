@@ -239,86 +239,124 @@ if menu == "Home":
     """, unsafe_allow_html=True)
 elif menu == "Prediction":
 
-    st.title("🔍 Diabetes Prediction")
+    st.title("🔍 Multi-Disease Prediction System")
+
+    # ================================
+    # SELECT DISEASE
+    # ================================
+    disease = st.selectbox(
+        "Select Disease to Diagnose",
+        ["Diabetes", "Heart Disease", "ENT Disorder", "Critical Condition", "General Surgery"]
+    )
 
     name = st.text_input("Patient Name")
 
-    col1, col2 = st.columns(2)
+    # ================================
+    # 1. DIABETES
+    # ================================
+    if disease == "Diabetes":
 
-    with col1:
-        pregnancies = st.number_input("Pregnancies", 0, 20, 1)
-        glucose = st.number_input("Glucose", 0, 200, 120)
-        bp = st.number_input("Blood Pressure", 0, 150, 70)
-        skin = st.number_input("Skin Thickness", 0, 100, 20)
+        st.subheader("🧪 Diabetes Parameters")
 
-    with col2:
-        insulin = st.number_input("Insulin", 0, 900, 80)
-        bmi = st.number_input("BMI", 0.0, 60.0, 25.0)
-        dpf = st.number_input("DPF", 0.0, 2.5, 0.5)
-        age = st.number_input("Age", 1, 120, 30)
+        col1, col2 = st.columns(2)
 
-    if st.button("Predict"):
+        with col1:
+            pregnancies = st.number_input("Pregnancies", 0, 20, 1)
+            glucose = st.number_input("Glucose", 0, 200, 120)
+            bp = st.number_input("Blood Pressure", 0, 150, 70)
+            skin = st.number_input("Skin Thickness", 0, 100, 20)
 
-        input_data = np.array([[pregnancies, glucose, bp, skin, insulin, bmi, dpf, age]])
-        input_scaled = scaler.transform(input_data)
+        with col2:
+            insulin = st.number_input("Insulin", 0, 900, 80)
+            bmi = st.number_input("BMI", 0.0, 60.0, 25.0)
+            dpf = st.number_input("DPF", 0.0, 2.5, 0.5)
+            age = st.number_input("Age", 1, 120, 30)
 
-        prediction = model.predict(input_scaled)
-        probability = model.predict_proba(input_scaled)
+        if st.button("Predict Diabetes"):
+            input_data = np.array([[pregnancies, glucose, bp, skin, insulin, bmi, dpf, age]])
+            input_scaled = scaler.transform(input_data)
+            prediction = model.predict(input_scaled)
 
-        result = "High Risk" if prediction[0] == 1 else "Low Risk"
+            if prediction[0] == 1:
+                st.error(f"⚠️ {name} - High Risk of Diabetes")
+            else:
+                st.success(f"✅ {name} - Low Risk of Diabetes")
 
-        if prediction[0] == 1:
-            st.error(f"⚠️ {name} - High Risk of Diabetes")
-        else:
-            st.success(f"✅ {name} - Low Risk of Diabetes")
+    # ================================
+    # 2. HEART DISEASE
+    # ================================
+    elif disease == "Heart Disease":
 
-        st.write("Probability:", probability)
+        st.subheader("❤️ Heart Parameters")
 
-        # Feature Importance
-        st.subheader("Feature Importance")
-        importance = model.feature_importances_
+        age_h = st.number_input("Age", 1, 120, 45)
+        chol = st.number_input("Cholesterol", 100, 400, 200)
+        bp_h = st.number_input("Blood Pressure", 80, 200, 120)
+        hr = st.number_input("Heart Rate", 60, 200, 90)
 
-        importance_df = pd.DataFrame({
-            "Feature": X.columns,
-            "Importance": importance
-        }).sort_values(by="Importance", ascending=True)
+        if st.button("Predict Heart Disease"):
+            risk = (chol + bp_h + age_h + hr) / 4
 
-        fig, ax = plt.subplots()
-        ax.barh(importance_df["Feature"], importance_df["Importance"])
-        st.pyplot(fig)
+            if risk > 160:
+                st.error(f"⚠️ {name} - High Risk of Heart Disease")
+            else:
+                st.success(f"✅ {name} - Low Risk of Heart Disease")
 
-        # ================================
-        # FIXED PDF (IN-MEMORY)
-        # ================================
-        def create_pdf():
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(buffer)
-            styles = getSampleStyleSheet()
+    # ================================
+    # 3. ENT DISORDER
+    # ================================
+    elif disease == "ENT Disorder":
 
-            content = []
+        st.subheader("👂 ENT Parameters")
 
-            content.append(Paragraph("Kavi Diagnosis", styles['Title']))
-            content.append(Spacer(1, 12))
+        fever = st.selectbox("Fever", [0, 1])
+        throat_pain = st.selectbox("Throat Pain", [0, 1])
+        hearing_loss = st.selectbox("Hearing Loss", [0, 1])
 
-            content.append(Paragraph(f"Patient Name: {name}", styles['Normal']))
-            content.append(Paragraph(f"Date: {datetime.now()}", styles['Normal']))
-            content.append(Spacer(1, 12))
+        if st.button("Predict ENT Issue"):
+            score = fever + throat_pain + hearing_loss
 
-            content.append(Paragraph(f"Result: {result}", styles['Normal']))
-            content.append(Paragraph(f"Probability: {probability}", styles['Normal']))
+            if score >= 2:
+                st.error(f"⚠️ {name} - Possible ENT Disorder")
+            else:
+                st.success(f"✅ {name} - Normal Condition")
 
-            doc.build(content)
-            buffer.seek(0)
-            return buffer
+    # ================================
+    # 4. CRITICAL CONDITION
+    # ================================
+    elif disease == "Critical Condition":
 
-        pdf_file = create_pdf()
+        st.subheader("🚑 Critical Care Parameters")
 
-        st.download_button(
-            label="📄 Download PDF Report",
-            data=pdf_file,
-            file_name="report.pdf",
-            mime="application/pdf"
-        )
+        oxygen = st.number_input("Oxygen Level (%)", 50, 100, 95)
+        pulse = st.number_input("Pulse Rate", 40, 150, 80)
+        consciousness = st.selectbox("Consciousness Level", ["Normal", "Drowsy", "Unconscious"])
+
+        if st.button("Check Condition"):
+            if oxygen < 90 or pulse > 120 or consciousness != "Normal":
+                st.error(f"🚨 {name} - Critical Condition! Immediate Care Needed")
+            else:
+                st.success(f"✅ {name} - Stable Condition")
+
+    # ================================
+    # 5. GENERAL SURGERY
+    # ================================
+    elif disease == "General Surgery":
+
+        st.subheader("🔪 Surgery Evaluation")
+
+        pain_level = st.slider("Pain Level (1-10)", 1, 10, 5)
+        swelling = st.selectbox("Swelling", [0, 1])
+        injury = st.selectbox("Recent Injury", [0, 1])
+
+        if st.button("Evaluate Surgery Need"):
+            score = pain_level + swelling*2 + injury*2
+
+            if score > 8:
+                st.error(f"⚠️ {name} - Surgery May Be Required")
+            else:
+                st.success(f"✅ {name} - No Immediate Surgery Needed")
+      
 
 # ================================
 # ABOUT
