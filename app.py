@@ -209,19 +209,7 @@ if menu == "Home":
     with c6:
         st.markdown("<div class='card'><h3>📄 PDF Report</h3><p>Download a patient screening report after a prediction.</p></div>", unsafe_allow_html=True)
 
-    st.markdown("## 📈 Model Status")
-    m1, m2 = st.columns(2)
-    with m1:
-        if diabetes_accuracy is not None:
-            st.metric("Diabetes model accuracy", f"{diabetes_accuracy*100:.1f}%")
-        else:
-            st.info("Diabetes model is unavailable.")
-    with m2:
-        if heart_accuracy is not None:
-            st.metric("Heart model accuracy", f"{heart_accuracy*100:.1f}%")
-        else:
-            st.info("Heart model could not be trained from the current CSV structure.")
-
+    
 # ============================================================
 # PREDICTION
 # ============================================================
