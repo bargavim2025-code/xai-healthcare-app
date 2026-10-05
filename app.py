@@ -209,7 +209,258 @@ if menu == "Home":
     with c6:
         st.markdown("<div class='card'><h3>📄 PDF Report</h3><p>Download a patient screening report after a prediction.</p></div>", unsafe_allow_html=True)
 
-    
+# =========================================================
+# HOSPITAL SPECIALITIES
+# =========================================================
+
+st.markdown("## 🏥 Our Specialities")
+st.write("Select a speciality to view doctors and their availability.")
+
+# Store selected speciality
+if "selected_speciality" not in st.session_state:
+    st.session_state.selected_speciality = None
+
+specialities = [
+    ("👂", "ENT"),
+    ("❤️", "Cardiology"),
+    ("🧴", "Dermatology"),
+    ("👁️", "Ophthalmology"),
+    ("🦷", "Dental"),
+    ("👩‍⚕️", "Gynecology")
+]
+
+# First row
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    if st.button("👂\nENT", use_container_width=True):
+        st.session_state.selected_speciality = "ENT"
+
+with col2:
+    if st.button("❤️\nCardiology", use_container_width=True):
+        st.session_state.selected_speciality = "Cardiology"
+
+with col3:
+    if st.button("🧴\nDermatology", use_container_width=True):
+        st.session_state.selected_speciality = "Dermatology"
+
+
+# Second row
+col4, col5, col6 = st.columns(3)
+
+with col4:
+    if st.button("👁️\nOphthalmology", use_container_width=True):
+        st.session_state.selected_speciality = "Ophthalmology"
+
+with col5:
+    if st.button("🦷\nDental", use_container_width=True):
+        st.session_state.selected_speciality = "Dental"
+
+with col6:
+    if st.button("👩‍⚕️\nGynecology", use_container_width=True):
+        st.session_state.selected_speciality = "Gynecology"
+
+
+# =========================================================
+# DOCTOR DATABASE
+# =========================================================
+
+doctor_data = {
+
+    "ENT": [
+        {
+            "name": "Dr. Anjali Verma",
+            "qualification": "MBBS, MS ENT",
+            "experience": "10+ years",
+            "availability": "Mon - Sat",
+            "time": "10:00 AM - 2:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        },
+        {
+            "name": "Dr. Suresh Kumar",
+            "qualification": "MBBS, DLO",
+            "experience": "12+ years",
+            "availability": "Mon - Fri",
+            "time": "4:00 PM - 8:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        }
+    ],
+
+    "Cardiology": [
+        {
+            "name": "Dr. Ravi Kumar",
+            "qualification": "MBBS, MD, DM Cardiology",
+            "experience": "15+ years",
+            "availability": "Mon - Sat",
+            "time": "9:00 AM - 1:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        },
+        {
+            "name": "Dr. Neha Sharma",
+            "qualification": "MBBS, MD Cardiology",
+            "experience": "11+ years",
+            "availability": "Tue - Sat",
+            "time": "3:00 PM - 7:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        }
+    ],
+
+    "Dermatology": [
+        {
+            "name": "Dr. Meera Krishnan",
+            "qualification": "MBBS, MD Dermatology",
+            "experience": "9+ years",
+            "availability": "Mon - Sat",
+            "time": "10:00 AM - 1:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        },
+        {
+            "name": "Dr. Rahul Menon",
+            "qualification": "MBBS, DDVL",
+            "experience": "8+ years",
+            "availability": "Mon - Fri",
+            "time": "5:00 PM - 8:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        }
+    ],
+
+    "Ophthalmology": [
+        {
+            "name": "Dr. Kavya Nair",
+            "qualification": "MBBS, MS Ophthalmology",
+            "experience": "12+ years",
+            "availability": "Mon - Sat",
+            "time": "9:30 AM - 1:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        },
+        {
+            "name": "Dr. Arun Prakash",
+            "qualification": "MBBS, MS Ophthalmology",
+            "experience": "10+ years",
+            "availability": "Tue - Sat",
+            "time": "4:00 PM - 7:30 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        }
+    ],
+
+    "Dental": [
+        {
+            "name": "Dr. Priya Menon",
+            "qualification": "BDS, MDS",
+            "experience": "10+ years",
+            "availability": "Mon - Sat",
+            "time": "10:00 AM - 1:00 PM",
+            "status": "Available Today",
+            "consultation": "In-person"
+        },
+        {
+            "name": "Dr. Ajay Kumar",
+            "qualification": "BDS, MDS",
+            "experience": "7+ years",
+            "availability": "Mon - Fri",
+            "time": "4:00 PM - 8:00 PM",
+            "status": "Available Today",
+            "consultation": "In-person"
+        }
+    ],
+
+    "Gynecology": [
+        {
+            "name": "Dr. Divya Srinivasan",
+            "qualification": "MBBS, MD Obstetrics & Gynecology",
+            "experience": "14+ years",
+            "availability": "Mon - Sat",
+            "time": "9:00 AM - 1:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        },
+        {
+            "name": "Dr. Swetha Iyer",
+            "qualification": "MBBS, DGO",
+            "experience": "9+ years",
+            "availability": "Mon - Fri",
+            "time": "3:00 PM - 7:00 PM",
+            "status": "Available Today",
+            "consultation": "Online / In-person"
+        }
+    ]
+}
+
+
+# =========================================================
+# DISPLAY SELECTED SPECIALITY
+# =========================================================
+
+selected = st.session_state.selected_speciality
+
+if selected:
+
+    st.markdown("---")
+
+    st.markdown(
+        f"## 👨‍⚕️ {selected} Specialists"
+    )
+
+    st.write(
+        f"Doctors available in our {selected} department:"
+    )
+
+    doctors = doctor_data[selected]
+
+    for doctor in doctors:
+
+        with st.container(border=True):
+
+            col1, col2 = st.columns([2, 1])
+
+            with col1:
+
+                st.markdown(
+                    f"### 👨‍⚕️ {doctor['name']}"
+                )
+
+                st.write(
+                    f"🎓 **Qualification:** {doctor['qualification']}"
+                )
+
+                st.write(
+                    f"💼 **Experience:** {doctor['experience']}"
+                )
+
+                st.write(
+                    f"📅 **Available:** {doctor['availability']}"
+                )
+
+                st.write(
+                    f"🕐 **Timing:** {doctor['time']}"
+                )
+
+                st.write(
+                    f"💻 **Consultation:** {doctor['consultation']}"
+                )
+
+            with col2:
+
+                st.success(
+                    f"🟢 {doctor['status']}"
+                )
+
+                if st.button(
+                    "📅 Book Appointment",
+                    key=f"book_{selected}_{doctor['name']}"
+                ):
+                    st.session_state.selected_doctor = doctor["name"]
+                    st.success(
+                        f"Selected {doctor['name']} for appointment."
+                    )    
 # ============================================================
 # PREDICTION
 # ============================================================
