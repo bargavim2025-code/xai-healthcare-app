@@ -1,0 +1,16 @@
+disease,symptom_1,symptom_2,symptom_3,symptom_4,symptom_5
+Diabetes,frequent_urination,excessive_thirst,fatigue,blurred_vision,increased_hunger
+Hypertension,headache,dizziness,blurred_vision,fatigue,nosebleed
+Common Cold,cough,sneezing,runny_nose,sore_throat,mild_fever
+Influenza,fever,body_ache,chills,cough,fatigue
+Migraine,headache,nausea,light_sensitivity,sound_sensitivity,dizziness
+Gastritis,stomach_pain,nausea,bloating,heartburn,loss_of_appetite
+Asthma,wheezing,shortness_of_breath,chest_tightness,cough,breathing_difficulty
+Allergic Rhinitis,sneezing,runny_nose,itchy_eyes,nasal_congestion,postnasal_drip
+Ear Infection,ear_pain,hearing_difficulty,fever,ear_pressure,irritability
+Urinary Tract Infection,burning_urination,frequent_urination,lower_abdominal_pain,cloudy_urine,urgency
+Anemia,fatigue,pale_skin,dizziness,shortness_of_breath,weakness
+Hypothyroidism,fatigue,weight_gain,cold_sensitivity,dry_skin,constipation
+GERD,heartburn,acid_regurgitation,chest_discomfort,difficulty_swallowing,cough
+Viral Gastroenteritis,vomiting,diarrhea,stomach_cramps,nausea,mild_fever
+Sinusitis,facial_pain,nasal_congestion,headache,thick_nasal_discharge,reduced_smell

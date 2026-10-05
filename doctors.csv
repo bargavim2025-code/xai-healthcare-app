@@ -1,0 +1,9 @@
+doctor_id,name,speciality,experience_years,location,consultation_type,record_type
+D001,Dr. Priya Sharma,Diabetology,12,Chennai,Online,DEMO
+D002,Dr. Ravi Kumar,Cardiology,15,Chennai,Online,DEMO
+D003,Dr. Anjali Verma,ENT,10,Chennai,Online,DEMO
+D004,Dr. Arjun Mehta,Orthopedics,11,Chennai,Online,DEMO
+D005,Dr. Karthik Raj,Critical Care,14,Chennai,Online,DEMO
+D006,Dr. Deepa Nair,General Surgery,9,Chennai,Online,DEMO
+D007,Dr. Meena Das,Internal Medicine,13,Chennai,Online,DEMO
+D008,Dr. Mohan Iyer,Endocrinology,10,Chennai,Online,DEMO
