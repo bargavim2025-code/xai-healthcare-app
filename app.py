@@ -464,377 +464,662 @@ if menu == "Home":
 # ============================================================
 # PREDICTION
 # ============================================================
-elif menu == "Prediction":
-    st.markdown("""
-    <div class="hero">
-        <h2>🧠 AI Health Assessment</h2>
-        <p>Symptoms + health parameters → possible conditions + screening risk</p>
-    </div>
-    """, unsafe_allow_html=True)
+# =========================
+# PREDICTION PAGE
+# =========================
+elif menu == "🧠 Prediction":
 
-    st.warning(
-        "Educational screening only. The displayed risk is an AI/model estimate, "
-        "not a clinical diagnosis or a guaranteed medical probability."
+    st.title("🧠 AI Health Assessment")
+    st.write(
+        "Enter the patient's symptoms. The system will dynamically show "
+        "health parameters relevant to the selected symptoms."
     )
 
-    st.subheader("👤 Patient Information")
-    p1, p2, p3 = st.columns(3)
-    with p1:
-        name = st.text_input("Patient Name", key="ai_name")
-    with p2:
-        age = st.number_input("Age", 1, 120, 30, key="ai_age")
-    with p3:
-        gender = st.selectbox("Gender", ["Prefer not to say", "Female", "Male", "Other"], key="ai_gender")
+    # -------------------------
+    # Patient details
+    # -------------------------
+    st.subheader("👤 Patient Details")
 
-    st.markdown("---")
-    st.subheader("🩺 Symptoms")
+    patient_name = st.text_input("Patient Name")
 
-    all_symptoms = sorted({s for r in symptom_records for s in r["symptoms"]})
+    col1, col2 = st.columns(2)
 
-    if all_symptoms:
-        selected_symptoms = st.multiselect(
-            "Select symptoms",
-            all_symptoms,
-            format_func=humanize_symptom,
-            key="ai_symptoms"
-        )
-        symptom_text = st.text_area(
-            "Or describe your symptoms",
-            placeholder="Example: headache, dizziness and fatigue",
-            key="ai_symptom_text"
-        )
-        text_norm = normalize_symptom(symptom_text)
-        free_matches = [
-            s for s in all_symptoms
-            if s in text_norm or s.replace("_", " ") in symptom_text.lower()
-        ]
-        combined_symptoms = list(dict.fromkeys(selected_symptoms + free_matches))
-    else:
-        selected_symptoms = st.multiselect(
-            "Select symptoms",
-            ["headache", "fever", "cough", "fatigue", "dizziness", "chest_discomfort", "shortness_of_breath"]
-        )
-        symptom_text = st.text_area("Describe your symptoms")
-        combined_symptoms = selected_symptoms
-
-    if combined_symptoms:
-        st.info(
-            "Detected: " + ", ".join(humanize_symptom(s) for s in combined_symptoms)
+    with col1:
+        age = st.number_input(
+            "Age",
+            min_value=1,
+            max_value=120,
+            value=25
         )
 
-    st.markdown("---")
-    st.subheader("📋 Health Parameters")
-    a, b, c = st.columns(3)
+    with col2:
+        gender = st.selectbox(
+            "Gender",
+            ["Male", "Female", "Other"]
+        )
 
-    with a:
-        glucose = st.number_input("Glucose (mg/dL)", 0.0, 400.0, 120.0)
-        bmi = st.number_input("BMI", 0.0, 70.0, 25.0)
-        cholesterol = st.number_input("Cholesterol (mg/dL)", 80.0, 500.0, 200.0)
+    # -------------------------
+    # Symptoms
+    # -------------------------
+    st.subheader("🩺 Select Symptoms")
 
-    with b:
-        bp = st.number_input("Blood Pressure (mmHg)", 50.0, 250.0, 120.0)
-        heart_rate = st.number_input("Heart Rate (bpm)", 30.0, 220.0, 75.0)
-        oxygen = st.number_input("Oxygen Saturation (%)", 50.0, 100.0, 98.0)
+    symptom_list = [
+        "Excessive thirst",
+        "Frequent urination",
+        "Unexplained weight loss",
+        "Fatigue",
+        "Blurred vision",
 
-    with c:
-        smoking = st.selectbox("Smoking", ["No", "Yes"])
-        family_history = st.selectbox("Family History", ["No", "Yes"])
-        temperature = st.number_input("Temperature (°C)", 34.0, 43.0, 37.0)
+        "Chest pain",
+        "Shortness of breath",
+        "Palpitations",
+        "Dizziness",
 
-    with st.expander("🩸 Additional diabetes parameters"):
-        d1, d2, d3 = st.columns(3)
-        with d1:
-            pregnancies = st.number_input("Pregnancies", 0, 20, 0)
-        with d2:
-            insulin = st.number_input("Insulin", 0.0, 900.0, 80.0)
-        with d3:
-            pedigree = st.number_input("Diabetes Pedigree Function", 0.0, 3.0, 0.5)
+        "Fever",
+        "Cough",
+        "Cold",
+        "Sore throat",
 
-    if st.button("🧠 Analyze Health", type="primary", use_container_width=True):
+        "Skin rash",
+        "Skin itching",
+        "Redness",
 
-        matches = match_symptoms(combined_symptoms, symptom_records)
+        "Eye pain",
+        "Blurred vision",
+        "Eye redness",
 
-        diabetes_ml = None
-        heart_ml = None
+        "Tooth pain",
+        "Gum swelling",
 
-        # Diabetes ML probability
-        if diabetes_model is not None:
-            values = {}
-            for feature in diabetes_features:
-                k = normalize_symptom(feature)
-                if k == "pregnancies":
-                    values[feature] = pregnancies
-                elif k == "glucose":
-                    values[feature] = glucose
-                elif k == "bloodpressure":
-                    values[feature] = bp
-                elif k == "skinthickness":
-                    values[feature] = float(diabetes_df[feature].median())
-                elif k == "insulin":
-                    values[feature] = insulin
-                elif k == "bmi":
-                    values[feature] = bmi
-                elif k == "diabetespedigreefunction":
-                    values[feature] = pedigree
-                elif k == "age":
-                    values[feature] = age
-                else:
-                    values[feature] = float(diabetes_df[feature].median())
+        "Abdominal pain",
+        "Irregular periods",
+        "Pelvic pain"
+    ]
 
-            try:
-                row = pd.DataFrame([[values[x] for x in diabetes_features]], columns=diabetes_features)
-                scaled = diabetes_scaler.transform(row)
-                diabetes_ml = float(diabetes_model.predict_proba(scaled)[0][1] * 100)
-            except Exception:
-                diabetes_ml = None
+    symptoms = st.multiselect(
+        "What symptoms does the patient have?",
+        symptom_list,
+        placeholder="Select one or more symptoms"
+    )
 
-        # Heart ML probability
-        if heart_model is not None:
-            values = {}
-            for feature in heart_features:
-                k = normalize_symptom(feature)
-                if k == "age":
-                    values[feature] = age
-                elif k in ["chol", "cholesterol"]:
-                    values[feature] = cholesterol
-                elif k in ["trestbps", "restingbp", "restingbloodpressure", "bloodpressure"]:
-                    values[feature] = bp
-                elif k in ["thalach", "maxheartrate", "maximumheartrate", "heartrate"]:
-                    values[feature] = heart_rate
-                elif k in ["smoking", "smoke", "smoker"]:
-                    values[feature] = int(smoking == "Yes")
-                elif k in ["cp", "chestpain", "chestpaintype"]:
-                    values[feature] = int(any("chest" in s for s in combined_symptoms))
-                else:
-                    values[feature] = float(heart_df[feature].median())
+    # -------------------------
+    # Dynamic health parameters
+    # -------------------------
 
-            try:
-                row = pd.DataFrame([[values[x] for x in heart_features]], columns=heart_features)
-                scaled = heart_scaler.transform(row)
-                probs = heart_model.predict_proba(scaled)[0]
-                classes = list(heart_model.classes_)
-                positive = [
-                    i for i, cls in enumerate(classes)
-                    if str(cls).lower() not in ["0", "false", "no", "negative"]
-                ]
-                heart_ml = float(probs[positive[-1]] * 100) if positive else float(max(probs) * 100)
-            except Exception:
-                heart_ml = None
+    health_data = {}
 
-        # Symptom scores
-        diabetes_symptoms = {
-            "frequent_urination", "excessive_thirst", "fatigue",
-            "blurred_vision", "increased_hunger"
-        }
-        heart_symptoms = {
-            "chest_discomfort", "shortness_of_breath",
-            "breathing_difficulty", "dizziness"
-        }
+    # Diabetes-related symptoms
+    diabetes_symptoms = {
+        "Excessive thirst",
+        "Frequent urination",
+        "Unexplained weight loss",
+        "Blurred vision"
+    }
 
-        diabetes_symptom = len(diabetes_symptoms.intersection(combined_symptoms)) / 5 * 100
-        heart_symptom = len(heart_symptoms.intersection(combined_symptoms)) / 4 * 100
+    # Heart-related symptoms
+    heart_symptoms = {
+        "Chest pain",
+        "Shortness of breath",
+        "Palpitations",
+        "Dizziness"
+    }
 
-        # Simple risk signals
-        diabetes_signal = 0
-        if glucose >= 126:
-            diabetes_signal += 30
-        elif glucose >= 100:
-            diabetes_signal += 15
-        if bmi >= 30:
-            diabetes_signal += 15
-        if bp >= 140:
-            diabetes_signal += 10
-        if family_history == "Yes":
-            diabetes_signal += 10
+    # Infection / respiratory symptoms
+    infection_symptoms = {
+        "Fever",
+        "Cough",
+        "Cold",
+        "Sore throat"
+    }
 
-        heart_signal = 0
-        if cholesterol >= 240:
-            heart_signal += 30
-        elif cholesterol >= 200:
-            heart_signal += 10
-        if bp >= 140:
-            heart_signal += 20
-        if smoking == "Yes":
-            heart_signal += 15
-        if heart_rate > 100:
-            heart_signal += 10
+    # Skin-related symptoms
+    skin_symptoms = {
+        "Skin rash",
+        "Skin itching",
+        "Redness"
+    }
 
-        if diabetes_ml is not None:
-            diabetes_risk = diabetes_ml * 0.65 + diabetes_symptom * 0.20 + diabetes_signal * 0.15
-        else:
-            diabetes_risk = diabetes_symptom * 0.60 + diabetes_signal * 0.40
+    # Eye-related symptoms
+    eye_symptoms = {
+        "Eye pain",
+        "Eye redness",
+        "Blurred vision"
+    }
 
-        if heart_ml is not None:
-            heart_risk = heart_ml * 0.65 + heart_symptom * 0.20 + heart_signal * 0.15
-        else:
-            heart_risk = heart_symptom * 0.60 + heart_signal * 0.40
+    # Dental symptoms
+    dental_symptoms = {
+        "Tooth pain",
+        "Gum swelling"
+    }
 
-        condition_risks = {
-            "Diabetes": min(max(diabetes_risk, 0), 99),
-            "Heart Disease": min(max(heart_risk, 0), 99)
-        }
+    # Gynecology symptoms
+    gyn_symptoms = {
+        "Abdominal pain",
+        "Irregular periods",
+        "Pelvic pain"
+    }
 
-        for match in matches:
-            if match["disease"] not in condition_risks:
-                condition_risks[match["disease"]] = match["score"]
+    # ---------------------------------
+    # Diabetes parameters
+    # ---------------------------------
+    if diabetes_symptoms.intersection(symptoms):
 
-        ranked = sorted(condition_risks.items(), key=lambda x: x[1], reverse=True)
+        st.subheader("🩸 Diabetes-Related Parameters")
 
-        if not ranked:
-            st.info("Enter at least one symptom or health parameter.")
-        else:
-            top_condition, top_risk = ranked[0]
+        col1, col2 = st.columns(2)
 
-            # Save the latest screening result so the "Fix ur diet" page can
-            # personalize its educational diet guidance.
-            st.session_state["latest_screening"] = {
-                "condition": top_condition,
-                "risk": float(top_risk),
-                "age": age,
-                "bmi": bmi,
-                "glucose": glucose,
-                "cholesterol": cholesterol,
-                "bp": bp,
-            }
-
-            st.markdown("---")
-            st.subheader("🧠 AI Screening Result")
-
-            r1, r2 = st.columns([2, 1])
-            with r1:
-                st.markdown(
-                    f"""
-                    <div class="card">
-                    <h2>Possible condition: {top_condition}</h2>
-                    <h3>Estimated screening risk: {top_risk:.1f}%</h3>
-                    <p><b>Risk level: {risk_level(top_risk)}</b></p>
-                    <p>This is a screening estimate, not a confirmed diagnosis.</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-            with r2:
-                st.metric("Risk", f"{top_risk:.1f}%")
-                st.progress(int(min(top_risk, 100)))
-
-            st.subheader("📊 Possible Conditions")
-            for condition, risk in ranked[:5]:
-                x, y = st.columns([4, 1])
-                with x:
-                    st.write(f"**{condition}**")
-                    st.progress(int(min(risk, 100)))
-                with y:
-                    st.metric("Risk", f"{risk:.1f}%")
-
-            if matches:
-                st.subheader("🔎 Symptom Evidence")
-                for m in matches[:3]:
-                    st.write(
-                        f"**{m['disease']}** — {m['score']:.1f}% symptom match"
-                    )
-                    st.caption(
-                        "Matched: " + ", ".join(humanize_symptom(s) for s in m["matched"])
-                    )
-
-            st.subheader("📋 Contributing Risk Signals")
-            signals = []
-            if glucose >= 126:
-                signals.append("Glucose is in a high screening range.")
-            elif glucose >= 100:
-                signals.append("Glucose is above the usual fasting screening range.")
-            if bmi >= 30:
-                signals.append("BMI is 30 or above.")
-            if cholesterol >= 240:
-                signals.append("Cholesterol is elevated.")
-            if bp >= 140:
-                signals.append("Blood pressure is elevated.")
-            if smoking == "Yes":
-                signals.append("Smoking was reported.")
-            if oxygen < 94:
-                signals.append("Oxygen saturation is below a typical screening threshold.")
-            if temperature >= 38:
-                signals.append("Temperature is elevated.")
-            if family_history == "Yes":
-                signals.append("Family history was reported.")
-            if not signals:
-                signals.append("No major rule-based risk signal was detected.")
-
-            for s in signals:
-                st.write("•", s)
-
-            st.subheader("👨‍⚕️ Suggested Specialist")
-
-            speciality_map = {
-                "Diabetes": "Diabetology",
-                "Heart Disease": "Cardiology",
-                "Hypertension": "Cardiology",
-                "Ear Infection": "ENT",
-                "Common Cold": "ENT",
-                "Sinusitis": "ENT",
-                "Allergic Rhinitis": "ENT",
-                "Asthma": "Critical Care",
-                "GERD": "General Surgery",
-            }
-
-            suggested = speciality_map.get(top_condition, "Internal Medicine")
-            st.success(f"Recommended department: **{suggested}**")
-
-            suggested_doctors = recommend_doctors(doctor_records, suggested)
-
-            if suggested_doctors:
-                for d in suggested_doctors[:3]:
-                    st.markdown(
-                        f"**{d['name']}** — {d['speciality']} | "
-                        f"{d['experience']} years | 📞 {d['phone']} | "
-                        f"🟢 {d['availability']}"
-                    )
-            else:
-                st.info("No matching doctor is available in doctors.csv.")
-
-            # PDF
-            def create_pdf():
-                buffer = BytesIO()
-                doc = SimpleDocTemplate(buffer)
-                styles = getSampleStyleSheet()
-                content = [
-                    Paragraph("Well Diagnosis - AI Health Screening Report", styles["Title"]),
-                    Spacer(1, 12),
-                    Paragraph(f"Patient: {name or 'Not provided'}", styles["Normal"]),
-                    Paragraph(f"Age: {age}", styles["Normal"]),
-                    Paragraph(f"Gender: {gender}", styles["Normal"]),
-                    Paragraph(f"Possible condition: {top_condition}", styles["Normal"]),
-                    Paragraph(f"Estimated screening risk: {top_risk:.1f}%", styles["Normal"]),
-                    Paragraph(f"Risk level: {risk_level(top_risk)}", styles["Normal"]),
-                    Paragraph(f"Suggested speciality: {suggested}", styles["Normal"]),
-                    Paragraph(
-                        "Symptoms: " + ", ".join(humanize_symptom(s) for s in combined_symptoms),
-                        styles["Normal"]
-                    ),
-                    Paragraph(f"Glucose: {glucose} mg/dL", styles["Normal"]),
-                    Paragraph(f"BMI: {bmi}", styles["Normal"]),
-                    Paragraph(f"Blood Pressure: {bp} mmHg", styles["Normal"]),
-                    Paragraph(f"Cholesterol: {cholesterol} mg/dL", styles["Normal"]),
-                    Paragraph(f"Heart Rate: {heart_rate} bpm", styles["Normal"]),
-                    Paragraph(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles["Normal"]),
-                    Spacer(1, 12),
-                    Paragraph(
-                        "Educational screening only. This report is not a medical diagnosis "
-                        "and does not replace professional medical advice.",
-                        styles["Normal"]
-                    )
-                ]
-                doc.build(content)
-                buffer.seek(0)
-                return buffer
-
-            st.download_button(
-                "📄 Download AI Screening Report",
-                data=create_pdf(),
-                file_name="well_diagnosis_ai_report.pdf",
-                mime="application/pdf",
-                use_container_width=True
+        with col1:
+            glucose = st.number_input(
+                "Blood Glucose (mg/dL)",
+                min_value=50.0,
+                max_value=500.0,
+                value=100.0
             )
 
+            bmi = st.number_input(
+                "BMI",
+                min_value=10.0,
+                max_value=60.0,
+                value=22.0
+            )
+
+        with col2:
+            insulin = st.number_input(
+                "Insulin Level",
+                min_value=0.0,
+                max_value=1000.0,
+                value=80.0
+            )
+
+            family_history_diabetes = st.checkbox(
+                "Family history of diabetes?"
+            )
+
+        health_data["Glucose"] = glucose
+        health_data["BMI"] = bmi
+        health_data["Insulin"] = insulin
+        health_data["Family_History_Diabetes"] = family_history_diabetes
+
+
+    # ---------------------------------
+    # Heart parameters
+    # ---------------------------------
+    if heart_symptoms.intersection(symptoms):
+
+        st.subheader("❤️ Heart-Related Parameters")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+
+            systolic_bp = st.number_input(
+                "Systolic Blood Pressure (mmHg)",
+                min_value=70,
+                max_value=250,
+                value=120
+            )
+
+            cholesterol = st.number_input(
+                "Cholesterol (mg/dL)",
+                min_value=80,
+                max_value=500,
+                value=180
+            )
+
+        with col2:
+
+            heart_rate = st.number_input(
+                "Heart Rate (bpm)",
+                min_value=30,
+                max_value=220,
+                value=75
+            )
+
+            smoking = st.checkbox(
+                "Does the patient smoke?"
+            )
+
+        health_data["Systolic_BP"] = systolic_bp
+        health_data["Cholesterol"] = cholesterol
+        health_data["Heart_Rate"] = heart_rate
+        health_data["Smoking"] = smoking
+
+
+    # ---------------------------------
+    # Infection parameters
+    # ---------------------------------
+    if infection_symptoms.intersection(symptoms):
+
+        st.subheader("🌡️ Infection / Respiratory Parameters")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+
+            temperature = st.number_input(
+                "Body Temperature (°C)",
+                min_value=30.0,
+                max_value=45.0,
+                value=36.8
+            )
+
+        with col2:
+
+            oxygen = st.number_input(
+                "Oxygen Saturation (SpO₂ %)",
+                min_value=50,
+                max_value=100,
+                value=98
+            )
+
+        health_data["Temperature"] = temperature
+        health_data["Oxygen"] = oxygen
+
+
+    # ---------------------------------
+    # Skin parameters
+    # ---------------------------------
+    if skin_symptoms.intersection(symptoms):
+
+        st.subheader("🧴 Skin-Related Parameters")
+
+        skin_duration = st.number_input(
+            "How many days has the skin problem been present?",
+            min_value=1,
+            max_value=365,
+            value=3
+        )
+
+        health_data["Skin_Duration"] = skin_duration
+
+
+    # ---------------------------------
+    # Eye parameters
+    # ---------------------------------
+    if eye_symptoms.intersection(symptoms):
+
+        st.subheader("👁️ Eye-Related Parameters")
+
+        eye_duration = st.number_input(
+            "How many days has the eye problem been present?",
+            min_value=1,
+            max_value=365,
+            value=2
+        )
+
+        health_data["Eye_Duration"] = eye_duration
+
+
+    # ---------------------------------
+    # Dental parameters
+    # ---------------------------------
+    if dental_symptoms.intersection(symptoms):
+
+        st.subheader("🦷 Dental Parameters")
+
+        dental_duration = st.number_input(
+            "How many days has the dental problem been present?",
+            min_value=1,
+            max_value=365,
+            value=2
+        )
+
+        health_data["Dental_Duration"] = dental_duration
+
+
+    # ---------------------------------
+    # Gynecology parameters
+    # ---------------------------------
+    if gyn_symptoms.intersection(symptoms):
+
+        st.subheader("👩‍⚕️ Related Parameters")
+
+        symptom_duration = st.number_input(
+            "Duration of the symptoms (days)",
+            min_value=1,
+            max_value=365,
+            value=3
+        )
+
+        health_data["Symptom_Duration"] = symptom_duration
+
+
+    # ---------------------------------
+    # No symptoms
+    # ---------------------------------
+    if len(symptoms) == 0:
+
+        st.info(
+            "Please select at least one symptom to display "
+            "the relevant health parameters."
+        )
+
+
+    # ---------------------------------
+    # Additional description
+    # ---------------------------------
+    st.subheader("📝 Additional Information")
+
+    description = st.text_area(
+        "Describe the patient's symptoms in your own words"
+    )
+
+
+    # ---------------------------------
+    # Prediction button
+    # ---------------------------------
+    if st.button("🔍 Analyze Health", use_container_width=True):
+
+        if not patient_name:
+            st.error("Please enter the patient name.")
+
+        elif not symptoms:
+            st.error("Please select at least one symptom.")
+
+        else:
+
+            # =========================
+            # Symptom-based scoring
+            # =========================
+
+            disease_scores = {
+                "Diabetes": 0,
+                "Heart Disease": 0,
+                "Respiratory / Infection": 0,
+                "Skin Disorder": 0,
+                "Eye Disorder": 0,
+                "Dental Problem": 0,
+                "Gynecological Condition": 0
+            }
+
+
+            # Diabetes scoring
+            diabetes_matches = len(
+                diabetes_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Diabetes"] = diabetes_matches * 20
+
+            if "Glucose" in health_data:
+
+                if health_data["Glucose"] >= 126:
+                    disease_scores["Diabetes"] += 30
+
+                elif health_data["Glucose"] >= 100:
+                    disease_scores["Diabetes"] += 15
+
+                if health_data["BMI"] >= 30:
+                    disease_scores["Diabetes"] += 15
+
+
+            # Heart scoring
+            heart_matches = len(
+                heart_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Heart Disease"] = heart_matches * 25
+
+            if "Systolic_BP" in health_data:
+
+                if health_data["Systolic_BP"] >= 140:
+                    disease_scores["Heart Disease"] += 20
+
+            if "Cholesterol" in health_data:
+
+                if health_data["Cholesterol"] >= 240:
+                    disease_scores["Heart Disease"] += 20
+
+            if "Smoking" in health_data and health_data["Smoking"]:
+                disease_scores["Heart Disease"] += 10
+
+
+            # Infection scoring
+            infection_matches = len(
+                infection_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Respiratory / Infection"] = (
+                infection_matches * 25
+            )
+
+            if "Temperature" in health_data:
+
+                if health_data["Temperature"] >= 38:
+                    disease_scores["Respiratory / Infection"] += 25
+
+
+            # Skin
+            skin_matches = len(
+                skin_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Skin Disorder"] = skin_matches * 35
+
+
+            # Eye
+            eye_matches = len(
+                eye_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Eye Disorder"] = eye_matches * 35
+
+
+            # Dental
+            dental_matches = len(
+                dental_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Dental Problem"] = dental_matches * 40
+
+
+            # Gynecology
+            gyn_matches = len(
+                gyn_symptoms.intersection(symptoms)
+            )
+
+            disease_scores["Gynecological Condition"] = gyn_matches * 30
+
+
+            # Keep values within 0–100
+            disease_scores = {
+                disease: min(score, 100)
+                for disease, score in disease_scores.items()
+            }
+
+
+            # Sort conditions
+            sorted_conditions = sorted(
+                disease_scores.items(),
+                key=lambda x: x[1],
+                reverse=True
+            )
+
+            possible_condition = sorted_conditions[0][0]
+            risk_probability = sorted_conditions[0][1]
+
+
+            # Risk level
+            if risk_probability >= 70:
+                risk_level = "HIGH"
+
+            elif risk_probability >= 40:
+                risk_level = "MODERATE"
+
+            else:
+                risk_level = "LOW"
+
+
+            # =========================
+            # Display result
+            # =========================
+
+            st.divider()
+
+            st.subheader("🧠 AI Screening Result")
+
+            st.success(
+                f"Possible Condition: {possible_condition}"
+            )
+
+            st.metric(
+                "Screening Risk Estimate",
+                f"{risk_probability}%"
+            )
+
+            if risk_level == "HIGH":
+
+                st.error(
+                    f"Risk Level: {risk_level}"
+                )
+
+            elif risk_level == "MODERATE":
+
+                st.warning(
+                    f"Risk Level: {risk_level}"
+                )
+
+            else:
+
+                st.info(
+                    f"Risk Level: {risk_level}"
+                )
+
+
+            # =========================
+            # Other possible conditions
+            # =========================
+
+            st.subheader("🔎 Other Possible Conditions")
+
+            for condition, score in sorted_conditions[1:4]:
+
+                if score > 0:
+
+                    st.write(
+                        f"**{condition}** — "
+                        f"Screening score: {score}%"
+                    )
+
+
+            # =========================
+            # Risk factors
+            # =========================
+
+            st.subheader("⚠️ Contributing Factors")
+
+            factors = []
+
+            if "Glucose" in health_data:
+                if health_data["Glucose"] >= 126:
+                    factors.append(
+                        "Elevated blood glucose"
+                    )
+
+            if "BMI" in health_data:
+                if health_data["BMI"] >= 30:
+                    factors.append(
+                        "High BMI"
+                    )
+
+            if "Systolic_BP" in health_data:
+                if health_data["Systolic_BP"] >= 140:
+                    factors.append(
+                        "High blood pressure"
+                    )
+
+            if "Cholesterol" in health_data:
+                if health_data["Cholesterol"] >= 240:
+                    factors.append(
+                        "High cholesterol"
+                    )
+
+            if "Smoking" in health_data:
+                if health_data["Smoking"]:
+                    factors.append(
+                        "Smoking history"
+                    )
+
+            if "Temperature" in health_data:
+                if health_data["Temperature"] >= 38:
+                    factors.append(
+                        "Elevated body temperature"
+                    )
+
+            if factors:
+
+                for factor in factors:
+                    st.write("•", factor)
+
+            else:
+
+                st.write(
+                    "No major risk factor detected from "
+                    "the entered parameters."
+                )
+
+
+            # =========================
+            # Specialist recommendation
+            # =========================
+
+            specialist_map = {
+
+                "Diabetes":
+                    "Diabetologist / Endocrinologist",
+
+                "Heart Disease":
+                    "Cardiologist",
+
+                "Respiratory / Infection":
+                    "General Physician",
+
+                "Skin Disorder":
+                    "Dermatologist",
+
+                "Eye Disorder":
+                    "Ophthalmologist",
+
+                "Dental Problem":
+                    "Dentist",
+
+                "Gynecological Condition":
+                    "Gynecologist"
+            }
+
+            specialist = specialist_map.get(
+                possible_condition,
+                "General Physician"
+            )
+
+            st.subheader("👨‍⚕️ Recommended Specialist")
+
+            st.info(specialist)
+
+
+            # =========================
+            # Save result for Fix ur diet
+            # =========================
+
+            st.session_state.latest_prediction = {
+                "patient_name": patient_name,
+                "age": age,
+                "gender": gender,
+                "symptoms": symptoms,
+                "condition": possible_condition,
+                "risk": risk_probability,
+                "risk_level": risk_level,
+                "health_data": health_data
+            }
+
+            st.success(
+                "Assessment completed. You can now open "
+                "🥗 Fix ur diet to view personalized general diet guidance."
+            )
+
+            st.caption(
+                "⚠️ This is an AI-assisted screening estimate for "
+                "educational purposes and is not a medical diagnosis."
+            )
 # ============================================================
 # FIX UR DIET
 # ============================================================
